@@ -1,0 +1,43 @@
+\section{Visual Featurization}
+\begin{enumerate}
+
+\item Describe goals
+
+\begin{enumerate}
+\item Spatially \& Scale invariant features
+\item Key in on primitives
+\end{enumerate}
+
+\item Describe different ways that you can get visual features
+\begin{enumerate}
+\item Deep features from Convolutional Neural Networks
+\begin{enumerate}
+\item Pre-trained Architectures (VGG, AlexNet, C3D)
+\item Encoding
+\item Dimensionality-reduction and Correlation
+\end{enumerate}
+\item Tracking with Optical Flow
+\item HOG
+\item SIFT
+\item PCA on RGB Images LOL \\
+Need to show Figure with PCA? on all of them 
+\end{enumerate}
+
+\item Describe what we did and our methodology
+
+\item Pre-processing
+\begin{itemize}
+\item Background subtraction
+\begin{itemize}
+\item A OpenCV built-in background subtraction algorithm was applied on each frame before pushing through the CNN. The algorithm was a Gaussian Mixture-based Background/Foreground Segmentation algorithm. It was introduced in the paper "An improved adaptive background mixture model for real-time tracking with shadow detection" by P. KadewTraKuPong and R. Bowden in 2001.
+\end{itemize}
+
+\item Cropping \& Scaling
+\begin{itemize}
+\item I cropped all frames by equal amounts to capture only the workspace where most of the robot manipulation happened. Then, they were rescaled to 640 x 480 dimensions. All pre-processing happened with ffmpeg.
+\end{itemize}
+
+\end{itemize}
+
+
+\end{enumerate}

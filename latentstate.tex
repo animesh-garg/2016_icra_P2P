@@ -1,0 +1,16 @@
+\section{Latent State $H_t$}
+Describe the process of linking kinematics and video (PCA, CCA, etc.).
+If we apply any VLAD or encoding, or batching, describe it here:
+
+\begin{itemize}
+\item Encoding - Current Status
+\begin{itemize}
+\item So I've implemented the following encoding method- Latent Content Descriptors (LCD) + VLAD. However, initial results weren't great and I need to see how it performs on milestones clustering.
+\end{itemize}
+
+\item Temporal Batching - Current Status
+\begin{itemize}
+\item While batching is supposed to help in video analysis , I've seen good separation of clusters (PCA on conv features) with just individual frames without clustering... I think I need to look into this more and need to test it out with milestones clustering.
+\end{itemize}
+
+\end{itemize}

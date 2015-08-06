@@ -1,0 +1,100 @@
+%\IEEEoverridecommandlockouts
+%\overrideIEEEmargins
+
+%floats and figures
+\usepackage{graphics}
+\usepackage[pdftex]{graphicx}
+\usepackage[font={small}]{caption}
+\usepackage{subcaption}
+%\usepackage[center]{subfigure} %DONT USE BOTH SUBCAPTION AND SUBFIGURE
+%\DeclareGraphicsExtensions{.pdf,.png,.jpg}
+%\usepackage{overpic}
+%\usepackage[rightcaption]{sidecap}
+%\usepackage{pbox}
+
+%Math Stuff
+\usepackage{mathtools}
+\usepackage{amsmath, amssymb, amscd}
+%\usepackage{ wasysym } %special symbols
+\usepackage{amsfonts}
+\usepackage{mathptmx}       % selects Times Roman as basic font
+\DeclareMathAlphabet{\mathcal}{OMS}{lmsy}{m}{n}
+\DeclareSymbolFont{largesymbols}{OMX}{cmex}{m}{n}
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+%\usepackage{algorithm}
+%\usepackage{algpseudocode}
+% \usepackage[ruled,vlined,linesnumbered]{algorithm2e}
+\usepackage{ textcomp } %for getting text tilde
+
+%Table Stuff
+\usepackage{array} %for table entries to be in center of cell
+\usepackage{tabularx}
+\usepackage{multicol}
+\usepackage{multirow}
+
+%DOCUMENT WIDE
+\usepackage{times} % assumes new font selection scheme installed
+\usepackage{xspace}
+\usepackage[english]{babel} %for hyphenation rules
+%\usepackage{flushend}%balance columns on last page
+\usepackage{fixltx2e} %fix latex issue across versions
+\usepackage{bm}
+\usepackage{units}
+
+\usepackage{makeidx}
+\usepackage{enumitem}
+\usepackage[yyyymmdd,hhmmss]{datetime}
+\usepackage[english]{babel}
+
+%Bibliography and cross-ref
+\makeatletter
+\let\NAT@parse\undefined
+\makeatother
+\usepackage[numbers]{natbib}
+\renewcommand{\bibfont}{\footnotesize}
+% \usepackage{cite} %DONT USE NATBIB AND CITE TOGETHER
+
+%hyperlinking
+\usepackage{url}
+\makeatletter
+\g@addto@macro{\UrlBreaks}{\UrlOrds}
+\makeatother
+\usepackage{color}
+\usepackage[usenames,dvipsnames, table]{xcolor}
+\usepackage[pdfborder={0 0 0.5}]{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    citecolor=black,
+    filecolor=cyan,
+    urlcolor=blue
+}
+
+
+%=======U S E R  D E F I N E D  M A C R O S=======
+% \newcommand{\bibhref}[2]{#2}
+\newcommand{\todo}[1]{\textcolor{red}{[#1]}}
+\newcommand{\tocite}[1]{\textcolor{red}{[cite]}}
+\newcommand{\ignore}[1]{}
+
+% Usage:
+% \figlabel{myfigure} creates \label{fig:myfigure}
+% \figref{myfigure} references it
+\newcommand{\figlabel}[1]{\label{fig:#1}}
+\newcommand{\figref}[1]{Figure~\ref{fig:#1}}
+
+% Usage:
+% \seclabel{mysection} creates \label{sec:mysection}
+% \secref{mysection} references it
+\newcommand{\seclabel}[1]{\label{sec:#1}}
+\newcommand{\secref}[1]{Section~\ref{sec:#1}}
+
+% Usage:
+% \tablabel{mytable} creates \label{tab:mytable}
+% \tabref{mytable} references it
+\newcommand{\tablabel}[1]{\label{tab:#1}}
+\newcommand{\tabref}[1]{Table~\ref{tab:#1}}
+
+% use this command instead of writing "da Vinci" so it's never split 
+\newcommand{\davinci}{da~Vinci\xspace}
