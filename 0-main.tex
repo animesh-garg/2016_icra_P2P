@@ -2,11 +2,9 @@
 
 %\let\labelindent\relax
 \input{preamble}
-
 \usepackage{blindtext}
 
 %===============================================================
-
 \title{\LARGE \bf
 Deep Segmentation of Surgical Robot Trajectories from Video 
 }
@@ -26,8 +24,7 @@ Adithyavairavan Murali, Animesh Garg, Sanjay Krishnan, Florian Pokorny, Ken Gold
 \maketitle
 
 \begin{abstract}
-Segmentation is an important first step in analyzing long running robotic tasks. 
-For reliable results, it is important to consider both visual and kinematic data, as visual data provides important information about the state of the workspace. 
+Segmentation is an important first step in analyzing long running robotic tasks. For reliable results, it is important to consider both visual and kinematic data, as visual data provides important information about the state of the workspace. 
 Existing unsupervised segmentation methodologies are limited in the ways they can leverage visual data and rely on annotations or complete knowledge of all objects in the world. In this paper, we propose a framework that takes a step towards unsupervised segmentation of robotic demonstrations using raw video (i.e., pixel data). 
 We identify key transition events in kinematic data, cluster transitions together using visual data, and then identify segments of the raw video corresponding to these clusters of transition events. 
 The resulting video segments can be used to design error recovery actions, parameter tuning, action classification, 
@@ -35,16 +32,16 @@ and operator skill assessment.
 \todo{Our results on x suggest y}
 \end{abstract} 
 
-\input{intro.tex}
-\input{relatedwork.tex}
-\input{problemsetup.tex}
-\input{cnn.tex}
-\input{latentstate.tex}
-\input{clustering.tex}
-\input{results.tex}
-\input{conclusion.tex}
+\input{1-intro.tex}
+\input{2-relatedwork.tex}
+\input{3-problemsetup.tex}
+\input{4-cnn.tex}
+\input{5-latentstate.tex}
+\input{6-clustering.tex}
+\input{7-results.tex}
+\input{8-conclusion.tex}
 
 \bibliographystyle{IEEEtranS}
-\bibliography{library,palpationCASE}
+\bibliography{deepP2P}
 
 \end{document}
