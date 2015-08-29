@@ -1,54 +1,57 @@
 \section{Introduction}
-Segmentation is often a first step when modeling trajectories of a human teleoperator executing a multistep task.
-This approach has been applied in robot skill-learning \cite{calinon2010learning, kruger2010learning, konidaris2011robot}, generalization to novel initial conditions in Learning from Demonstrations \cite{Niekum2015}, and operator skill classification \cite{Reiley2009}.
-Segmentation models fall into three broad categories: (1) dictionary-based, (2) label-based, and (3) unsupervised.
-Dictionary-based approaches set a pre-defined vocabulary of primitives \emph{a priori} and decompose new trajectories in terms of the primitives.
-Label-based approaches require annotation of examples segments, and learn a segmentation policy from examples.
-Unsupervised methods assume some structure to the data, e.g., local linearity, and fit trajectories to this model grouping together locally similar points.
-Unsupervised techniques can avoid time consuming labeling or dependence on a pre-defined set of primitives.
+Segmenting demonstrations of a multistep task is an important first step in a number of robot learning applications: skill-learning \cite{calinon2010learning, kruger2010learning, konidaris2011robot}, learning from demonstrations \cite{Niekum2015}, reward function parametrization \cite{hanlearning}, and automation of surgical subtasks \cite{murali2015learning}.
+One approach is manual annotation, which can be time-consuming and error-prone if inconsistent.
+Therefore, it is desirable to algorithmically extract segments from unlabled data.
+Such algorithms fall into two broad categories: (1) dictionary-based, (2) and unsupervised.
+Dictionary-based algorithms set a pre-defined vocabulary of primitives \emph{a priori} and decompose new trajectories in terms of the primitives; and this approach has been widely applied in the analysis of robotic surgery \cite{DBLP:dblp_conf/wacv/LeaHV15,zappella2013surgical}.
 
-Increasingly, fixed camera video recordings accompany kinematic recordings of human teleoperation in a variety of datasets [cite].
-Video can provide important information about the state of the environment and the relative orientation of the robot and other objects.
-This information is crucial for segmentation that does not overfit to the robot's exact position and learns higher level task properties (i.e., the robot needs to contact an object).
-While label- and dictionary-based approaches have been applied to segment multi-modal demonstrations\cite{DBLP:dblp_conf/wacv/LeaHV15,zappella2013surgical}, existing unsupervised approaches rely on hand tuned features (Krishnan et al. [cite]) or poses for all objects in the workspace via AR markers (Neikum et al. [cite]).
-Leveraging raw visual data, i.e., pixels, for unsupervised segmentation is challenging due to the dimensionality and the featurization problem.
+However, the key challenge in using a dictionary-based approach is building the dictionary of primitives. 
+Overly specific primitives may not cover all of the actions seen in a set of demonstrations, while overly general primitives may miss task-specific structure.
+Unsupervised techniques can avoid dependence on a pre-defined set of primitives.
+Unsupervised methods typically assume some generative mixture model for the data, e.g., locally Gaussian segments, and fit trajectories to this model grouping together locally similar points \cite{calinon2010learning, krishnan2015tsc, calinon2004stochastic, kruger2010learning, fox2009nonparametric, oh2005learning}.
 
+While unsuperivsed segmentation has been widely studied in the context of kinematic data segmentation, increasingly, fixed camera video recordings accompany kinematic recordings of human teleoperation in a variety of datasets \cite{hodgins2009guide, gao2014jigsaws, ofli2013berkeley}.
+The importance of visual sensing in segmentation has been suggested by experimental results in our prior work \cite{krishnan2015tsc} and by others \cite{Niekum2015}.
+Visual features can provide crucial information in a number of scenarios: (1) a robot can only partially observe its state with kinematic data, (2) state-dependent sensor noise in a robots kinematic data, and (3) manipulations of objects in the environment.
+However, existing unsupervised approaches rely on highly constrained visual sensing models: hand tuned features \cite{krishnan2015tsc}, poses for all objects in the workspace via AR markers \cite{Niekum2015}, or motion capture markers in human gesture extraction \cite{kulic2011incremental}.
+
+In this work, we explore how we can relax these constraints by segmenting both kinematics and natural videos of demonstrations.
+The key problem is leveraging raw visual data, i.e., pixels, due to the dimensionality and the featurization problem.
+Fortunately, in computer vision, the growing maturity of \emph{deep} featurization e.g., Convolutional Neural Networks (CNNs), has led to a number of seminal results in visual feature extraction \cite{krizhevsky2012imagenet, lecun1995convolutional, jia2014caffe, long2014fully}.
+Furthermore, frameworks like CAFFE \cite{jia2014caffe} allow for sharing pre-trained models (on terabyte-scale corpora of natural images), and this allows us to take advantage of these results even with relatively small datasets.
+
+We explore an extension (\sys) to the Transition State Clustering algorithm \cite{krishnan2015tsc} with visual features.
+At a high-level, this algorithm models demonstrations as switched linear dynamical systems.
+It then identifies states at which regime transitions occur and clusters these states to identify regions of the state space associated with transitions.
+The minimal covering set of transition clusters, i.e., clusters representing all demonstrations, gives a semantic segmentation for a task. 
+We extend this framework by specifying the state space not only with kinematic states but also augmented with visual features.
+Our experimental results surprisingly suggest that a time-series of frame-level visual features behave almost like smooth kinematic trajectories--satisfying the assumptions in our prior work.
+Even with featurized videos, segmentation is not trivial, and there are a number of open questions including how to incorporate visual features into the model, how to navigate the number of hyperparameter and architecture choices, and the sufficiency of pre-trained networks.
+
+We summarize the key experimental results.
+
+\vspace{0.25em}
+
+\textbf{Q0. Do generic visual features, deep or otherwise, improve segmentation accuracy? } While prior work in segmentation establishes that features from a constrained/hand-annotated visual sensing model can improve segmentation, an open question is whether there is enough information in natural videos with general-purpose features to improve segmentation accuracy. Our experimental results find that under partial kinematic observation and sensing noise, visual features dramatically improve segmentation accuracy by \textbf{x\%???}.
+
+\vspace{0.25em}
+
+\textbf{Q1. How do we transfer pre-trained neural network features to a very different domain? } Transfer learning of convolutional neural networks is an open problem in the computer vision community and a number of recent publications suggest caution or highly sensitive results \cite{oquab2014learning}.  These networks are trained on very different corpora of images than those seen in robotic demonstration videos. Even so, our results suggest that with the appropriate choice of convolutional layer to transfer, we can achieve accuracy improvements of \textbf{x\%???}.
+
+\vspace{0.25em}
+
+\textbf{Q2. How should visual features be incorporated into a kinematic segmentation model? } Even with automated featurization, the visual feature space is much higher dimensional than the kinematic state space. We explore dimensionality reduction techniques to mitigate some challenges due to the dimensionality. A natural approach would be to treat this problem as a multi-view manifold alignment problem e.g., finding a feature space maximally correlated with kinematics with Canonical Correlation Analysis. Surprisingly, our results suggest that this approach discards the novel information discovered by vision, and in fact random projections would do just as well (\textbf{x\%???}).
+
+\vspace{0.25em}
+
+\textbf{Q3. How do learned segmentations compare with human annotations? } We apply \sys to data from two datasets of surgical tasks \cite{gao2014jigsaws} where there were also human annotations of the same tasks.
+While we find that \sys mostly agrees with the human annotations, there are a number of instances where \sys find crucial actions missed by the human annotators. (\textbf{List examples}) 
+
+\iffalse
 \begin{figure}[ht]
 \centering
 \includegraphics[width=\columnwidth]{figures/architecture.pdf}
 \caption{\todo{name} architecture. We use a pre-trained CNN to featurize raw video data for use in segmentation. After featurization, we combine the data with kinematic data and apply a Transition State Clustering algorithm to identify segments. \label{fig:arch}}
 \vspace{-1em}
 \end{figure}
-
-An application of particular interest is robotic surgery.
-There are large and growing datasets of teleoperated surgical tasks with kinematic and camera recordings.
-These recordings can facilitate automation via finite state machines, but a first step is segmentation.
-In our prior work (Krishnan et al. [cite]), recognizing a number of surgery specific challenges such as temporal inconsistency and looping e.g., where a surgeon may attempt insertion 2-3 times, we proposed a non-parametric Bayesian model called Transition State Clustering (TSC).
-Essentially, the model identifies states that mark linear dynamical regime transitions and clusters these states across demonstrations considering both spatial and temporal similarity.
-Our results on real and synthetic data suggests this model is more robust to the demonstration inconsistencies prevalent in surgical tasks, even when these tasks were executed in a consistent environment (i.e., identical tissue phantoms). 
-
-In this paper, we propose a \todo{name} algorithm that applies unsupervised segmentation to surgical demonstrations consisting of kinematic trajectories and video data.
-To address the featurization problem in video, we leverage the growing maturity of Convolution Neural Networks (CNNs) in computer vision.
-There are a number of architectures  (e.g., AlexNet [cite]) that are trained on immensely large datasets of nature images, and these pre-trained models can be applied to featurize video.
-However, using a CNN as a featurizer is only part of the solution.
-We design a variant of the TSC method to jointly consider both kinematic and high-dimensional featurized video data.
-We illustrate the architecture in Figure \ref{fig:arch}.
-
-In this application, pre-trained neural networks give us a convenient and transferable featurization.
-We can leverage large datasets without having to do the training ourselves.
-These results are complementary to the Bayesian model described in our prior work.
-We model demonstrations as a time-varying stochastic process, with a discrete set of switching points.
-At each time $t$, there is a hidden latent state that generates both the kinematics and video data.
-Our goal is to define a segmentation w.r.t to that hidden state.
-The algorithm that we propose in this paper is one approach to fit parameters to this model.
-
-\todo{add about CCA if it pans out, add about fine tuning}
-
-In summary, our contributions are as follows:
-\begin{enumerate}
-\item We propose an algorithm to segment demonstrations from kinematic and raw video data via a pre-trained CNN.
-\item We describe a generative model to integrate the two types of data with dimensionality reduction.
-\item We provide a comprehensive evaluation of parameters and model choice when using pre-trained CNNs for use with robotic demonstrations.
-\item \todo{results suggest...}
-\end{enumerate}
-
+\fi
