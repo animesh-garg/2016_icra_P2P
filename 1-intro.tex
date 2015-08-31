@@ -1,19 +1,28 @@
 \section{Introduction}
-Segmenting demonstrations of a multistep task is an important first step in a number of robot learning applications: skill-learning \cite{calinon2010learning, kruger2010learning, konidaris2011robot}, learning from demonstrations \cite{Niekum2015}, reward function parametrization \cite{hanlearning}, and automation of surgical subtasks \cite{murali2015learning}.
+Segmenting demonstrations of a multistep task is an important first step in a number of robot learning applications: skill-learning \cite{calinon2010learning, kruger2010learning, konidaris2011robot}, learning from demonstrations \cite{Niekum2015learning}, reward function parametrization \cite{hanlearning}, and automation of surgical subtasks \cite{murali2015learning}.
 One approach is manual annotation, which can be time-consuming and error-prone if inconsistent.
 Therefore, it is desirable to algorithmically extract segments from unlabled data.
 Such algorithms fall into two broad categories: (1) dictionary-based, (2) and unsupervised.
-Dictionary-based algorithms set a pre-defined vocabulary of primitives \emph{a priori} and decompose new trajectories in terms of the primitives; and this approach has been widely applied in the analysis of robotic surgery \cite{DBLP:dblp_conf/wacv/LeaHV15,zappella2013surgical}.
+Dictionary-based algorithms set a pre-defined vocabulary of primitives \emph{a priori} and decompose new trajectories in terms of the primitives; and this approach has been widely applied in the analysis of robotic surgery \cite{lea15improved,zappella2013surgical}.
 
 However, the key challenge in using a dictionary-based approach is building the dictionary of primitives. 
 Overly specific primitives may not cover all of the actions seen in a set of demonstrations, while overly general primitives may miss task-specific structure.
 Unsupervised techniques can avoid dependence on a pre-defined set of primitives.
 Unsupervised methods typically assume some generative mixture model for the data, e.g., locally Gaussian segments, and fit trajectories to this model grouping together locally similar points \cite{calinon2010learning, krishnan2015tsc, calinon2004stochastic, kruger2010learning, fox2009nonparametric, oh2005learning}.
 
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{figures/pr2_plane_assembly.png}
+\caption{The figure shows a sequence of images from the Toy Plane assembly (YCB Dataset). The first row shows a manual segmentation of the task in 4 semantic steps: Grasp Fuselage, Transfer Fuselage, Grasp Wing, Transfer Fuselage. Rows 2-4 show the sub-task level segmentation results from our completely unsupervised approach using 8 examples. Each row is a sequence of transitions represented by blocks. The width of every block represents the confidence interval conveying the length of transition, with some transitions being sharp while others are longer.}
+ \label{fig:pr2_toyplane}
+\vspace{-10pt} 
+\end{figure}
+
 While unsuperivsed segmentation has been widely studied in the context of kinematic data segmentation, increasingly, fixed camera video recordings accompany kinematic recordings of human teleoperation in a variety of datasets \cite{hodgins2009guide, gao2014jigsaws, ofli2013berkeley}.
-The importance of visual sensing in segmentation has been suggested by experimental results in our prior work \cite{krishnan2015tsc} and by others \cite{Niekum2015}.
+The importance of visual sensing in segmentation has been suggested by experimental results in our prior work \cite{krishnan2015tsc} and by others \cite{Niekum2015learning}.
 Visual features can provide crucial information in a number of scenarios: (1) a robot can only partially observe its state with kinematic data, (2) state-dependent sensor noise in a robots kinematic data, and (3) manipulations of objects in the environment.
-However, existing unsupervised approaches rely on highly constrained visual sensing models: hand tuned features \cite{krishnan2015tsc}, poses for all objects in the workspace via AR markers \cite{Niekum2015}, or motion capture markers in human gesture extraction \cite{kulic2011incremental}.
+However, existing unsupervised approaches rely on highly constrained visual sensing models: hand tuned features \cite{krishnan2015tsc}, poses for all objects in the workspace via AR markers \cite{Niekum2015learning}, or motion capture markers in human gesture extraction \cite{kulic2011incremental}.
 
 In this work, we explore how we can relax these constraints by segmenting both kinematics and natural videos of demonstrations.
 The key problem is leveraging raw visual data, i.e., pixels, due to the dimensionality and the featurization problem.

@@ -8,6 +8,12 @@ If we apply any VLAD or encoding, or batching, describe it here:
 \item So I've implemented the following encoding method- Latent Content Descriptors (LCD) + VLAD. However, initial results weren't great and I need to see how it performs on milestones clustering.
 \end{itemize}
 
+
+Vector of Locally Aggregated Descriptors (VLAD) image encoding as proposed by \cite{jegou2010aggregating} is a method a feature encoding and pooling method, similar to Fisher vectors. VLAD encodes a set of local feature descriptors $I=(x_1,\ldots,x_n)$ extracted from an image using a codebook $\mathrm{C} = \{c_1, \ldots, \c_m \}$ built using a clustering method such as Gaussian Mixture Models (GMM) or K-means clustering.
+
+
+VLAD was shown to perform better than Fisher vectors and average pooling for encoding multiple frames~\cite{xu2014discriminative}.
+
 \item Temporal Batching - Current Status
 \begin{itemize}
 \item While batching is supposed to help in video analysis , I've seen good separation of clusters (PCA on conv features) with just individual frames without clustering... I think I need to look into this more and need to test it out with milestones clustering.
