@@ -1,25 +1,20 @@
 \documentclass[letterpaper, 10 pt, conference]{ieeeconf}
 
-
 %\let\labelindent\relax
 \input{preamble}
 \usepackage{blindtext}
 
-\newboolean{include-notes}
-\setboolean{include-notes}{true}
-\newcommand{\fp}[1]{\ifthenelse{\boolean{include-notes}}%
- {\textcolor{blue}{\textbf{FP: #1}}}{}}
 %===============================================================
 \title{\LARGE \bf
-Learning Sub-Task Level Semantic Segmentation of Multi-Step Task Trajectories from Video with Deep Learning
-\\{\color{blue} V0.2 Wed 09-02-2015 11:05am}
-}
+Pixels to Primitives: Learning Sub-Task Level Semantic Segmentation \\
+of Multi-Step Task Trajectories from Video with Deep Learning }
 % Pixels to Primitives (P2P)
 
 \author{%
-Adithyavairavan Murali*, Animesh Garg*, Sanjay Krishnan*, Florian Pokorny, Pieter Abbeel, Ken Goldberg
+Adithyavairavan Murali*, Animesh Garg*, Sanjay Krishnan*, Florian Pokorny,\\ 
+Pieter Abbeel, Trevor Darrell, Ken Goldberg \quad {\textcolor{blue}{[v0.1, \today\,\currenttime]}}
 \thanks{\hrule \vspace{5pt} * The authors contributed equally to the paper}%
-\thanks{EECS \& IEOR, University of California, Berkeley CA USA; \texttt{\{adithya\_murali, animesh.garg, sanjaykrishnan, ftpokorny, goldberg\}@berkeley.edu}}%
+\thanks{EECS \& IEOR, University of California, Berkeley CA USA; \texttt{\{adithya\_murali, animesh.garg, sanjaykrishnan, ftpokorny, pabbeel, trevor, goldberg\}@berkeley.edu}}%
 % \thanks{$^{1}$EECS, University of California, Berkeley; {\{sanjaykrishnan, adithya\_murali\}@berkeley.edu}}%
 % \thanks{$^{2}$IEOR and EECS, University of California, Berkeley; {\{animesh.garg, goldberg\}@berkeley.edu}}%
 }
@@ -31,32 +26,25 @@ Adithyavairavan Murali*, Animesh Garg*, Sanjay Krishnan*, Florian Pokorny, Piete
 \maketitle
 
 \begin{abstract}
-    
-Segmentation 
-\fp{let's disambiguate: temporal segmentation?}
-is an important first step in analyzing long running robotic tasks. For reliable results, it is important \fp{too strong
-    assertion - incorporate Ken's feedback on this. I.e. relationship to previous work, factual statement of what we
-investigate } to consider both visual and kinematic data, as visual data provides important 
-information about the state of the workspace. \fp{avoid such statements - we investigate this} 
+Segmentation is an important first step in analyzing long running robotic tasks. For reliable results, it is important to consider both visual and kinematic data, as visual data provides important information about the state of the workspace. 
 Existing unsupervised segmentation methodologies are limited in the ways they can leverage visual data and rely on annotations or complete knowledge of all objects in the world. In this paper, we propose a framework that takes a step towards unsupervised segmentation of robotic demonstrations using raw video (i.e., pixel data). 
 We identify key transition events in kinematic data, cluster transitions together using visual data, and then identify segments of the raw video corresponding to these clusters of transition events. 
 The resulting video segments can be used to design error recovery actions, parameter tuning, action classification, 
-and operator skill assessment.\fp{overstatement, instead list experimental contributions only and that we extend your
-ISRR work} 
+and operator skill assessment. 
 \todo{Our results on x suggest y}
 \end{abstract} 
 
 \input{1-intro.tex}
 \input{2-relatedwork.tex}
 \input{3-problemsetup.tex}
-\input{4-cnn.tex}
-\input{5-latentstate.tex}
-\input{6-clustering.tex}
+\input{4-clustering.tex}
+\input{5-cnn.tex}
+\input{6-latentstate.tex}
 \input{7-results.tex}
 \input{8-conclusion.tex}
 
-\subsection*{Acknowledgement}
-
+\subsubsection*{Acknowledgement}
+This work is supported in part by a seed grant from the UC Berkeley CITRIS, and by the U.S.\ NSF Award IIS-1227536: Multilateral Manipulation by Human-Robot Collaborative Systems. We thank Intuitive Surgical, Simon DiMao, and the dVRK community for support; NVIDIA for computing equipment grants; Andy Chou and Susan Lim for developmental grants; and Sergey Levine and Katerina Fragkiadaki.
 
 \bibliographystyle{IEEEtranS}
 \bibliography{deepP2P}

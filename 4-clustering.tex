@@ -1,0 +1,31 @@
+\section{Our Approach: Hierarchical Dirichlet  Clustering}
+Describe the clustering procedure--refer to ISRR when needed.
+
+\begin{algorithm}[t]
+\caption{The Transition State Clustering Algorithm \todo{Fix with changes} \label{algotext}}
+\begin{algorithmic}[1]
+\scriptsize
+\State \textsf{Input: } $\mathcal{D}$, $\rho$ pruning parameter, and $\delta$ compaction parameter.
+
+\State $n(t) = \binom{\mathbf{x}(t+1)}{\mathbf{x}(t)}$. 
+
+\State Cluster the vectors $n(t)$ using DP-GMM assigning each state to its most likely cluster. 
+
+\State \emph{Transition states} are times when $n(t)$ is in a different cluster than $n(t+1)$. 
+
+\State Remove states that transition to and from clusters with less than a fraction of $p$ demonstrations. 
+
+\State Remove consecutive transition states when the L2 distance between these transitions is less than $\delta$. 
+
+\State Cluster the remaining transition states in the state space $\mathbf{x}(t+1)$ using DP-GMM.
+
+\State Within each state-space cluster, sub-cluster the transition states temporally. 
+
+\State \textsf{Output: } A set $\mathcal{M}$ of clusters of transition states and the associated with each cluster a time interval of transition times.
+\end{algorithmic}
+\end{algorithm}
+
+\noindent \todo{Changes to Algorithm}\\
+-- Skill Weighted Pruning\\
+-- Final Time Clustering over k-folds to regularization
+
