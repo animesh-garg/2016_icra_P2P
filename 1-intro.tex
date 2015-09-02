@@ -15,7 +15,8 @@ Unsupervised methods typically assume some generative mixture model for the data
 \centering
 \includegraphics[width=\linewidth]{figures/pr2_plane_assembly.png}
 \caption{The figure shows a sequence of images from the Toy Plane assembly (YCB Dataset). The first row shows a manual segmentation of the task in 4 semantic steps: Grasp Fuselage, Transfer Fuselage, Grasp Wing, Transfer Fuselage. Rows 2-4 show the sub-task level segmentation results from our completely unsupervised approach using 8 examples. Each row is a sequence of transitions represented by blocks. The width of every block represents the confidence interval conveying the length of transition, with some transitions being sharp while others are longer.}
- \label{fig:pr2_toyplane}
+\figlabel{pr2_toyplane}
+% \label{fig:pr2_toyplane}
 \vspace{-10pt} 
 \end{figure}
 
@@ -41,26 +42,27 @@ We summarize the key experimental results.
 
 \vspace{0.25em}
 
-\textbf{Q0. Do generic visual features, deep or otherwise, improve segmentation accuracy? } While prior work in segmentation establishes that features from a constrained/hand-annotated visual sensing model can improve segmentation, an open question is whether there is enough information in natural videos with general-purpose features to improve segmentation accuracy. Our experimental results find that under partial kinematic observation and sensing noise, visual features dramatically improve segmentation accuracy by \textbf{x\%???}.
+\noindent \textbf{Q0. Do generic visual features, deep or otherwise, improve segmentation accuracy? } While prior work in segmentation establishes that features from a constrained/hand-annotated visual sensing model can improve segmentation, an open question is whether there is enough information in natural videos with general-purpose features to improve segmentation accuracy. Our experimental results find that under partial kinematic observation and sensing noise, visual features dramatically improve segmentation accuracy by \todo{x\%}.
 
 \vspace{0.25em}
 
-\textbf{Q1. How do we transfer pre-trained neural network features to a very different domain? } Transfer learning of convolutional neural networks is an open problem in the computer vision community and a number of recent publications suggest caution or highly sensitive results \cite{oquab2014learning}.  These networks are trained on very different corpora of images than those seen in robotic demonstration videos. Even so, our results suggest that with the appropriate choice of convolutional layer to transfer, we can achieve accuracy improvements of \textbf{x\%???}.
+\noindent \textbf{Q1. How do we transfer pre-trained neural network features to a very different domain? } Transfer learning of convolutional neural networks is an open problem in the computer vision community and a number of recent publications suggest caution or highly sensitive results \cite{oquab2014learning}\todo{add nips paper}.  These networks are trained on very different corpora of images than those seen in robotic demonstration videos. Even so, our results suggest that with the appropriate choice of convolutional layer to transfer, we can achieve accuracy improvements of \todo{x\%}.
 
 \vspace{0.25em}
 
-\textbf{Q2. How should visual features be incorporated into a kinematic segmentation model? } Even with automated featurization, the visual feature space is much higher dimensional than the kinematic state space. We explore dimensionality reduction techniques to mitigate some challenges due to the dimensionality. A natural approach would be to treat this problem as a multi-view manifold alignment problem e.g., finding a feature space maximally correlated with kinematics with Canonical Correlation Analysis. Surprisingly, our results suggest that this approach discards the novel information discovered by vision, and in fact random projections would do just as well (\textbf{x\%???}).
+\noindent \textbf{Q2. How should visual features be incorporated into a kinematic segmentation model? } Even with automated featurization, the visual feature space is much higher dimensional than the kinematic state space. We explore dimensionality reduction techniques to mitigate some challenges due to the dimensionality. A natural approach would be to treat this problem as a multi-view manifold alignment problem e.g., finding a feature space maximally correlated with kinematics with Canonical Correlation Analysis. Surprisingly, our results suggest that this approach discards the novel information discovered by vision, and in fact random projections would do just as well (\todo{x\%}).
 
 \vspace{0.25em}
 
-\textbf{Q3. How do learned segmentations compare with human annotations? } We apply \sys to data from two datasets of surgical tasks \cite{gao2014jigsaws} where there were also human annotations of the same tasks.
-While we find that \sys mostly agrees with the human annotations, there are a number of instances where \sys find crucial actions missed by the human annotators. (\textbf{List examples}) 
+\noindent \textbf{Q3. How do learned segmentations compare with human annotations? } We apply \sys to data from two datasets of surgical tasks \cite{gao2014jigsaws} where there were also human annotations of the same tasks.
+While we find that \sys mostly agrees with the human annotations, there are a number of instances where \sys find crucial actions missed by the human annotators. (\todo{List examples}) 
 
 \iffalse
 \begin{figure}[ht]
 \centering
 \includegraphics[width=\columnwidth]{figures/architecture.pdf}
-\caption{\todo{name} architecture. We use a pre-trained CNN to featurize raw video data for use in segmentation. After featurization, we combine the data with kinematic data and apply a Transition State Clustering algorithm to identify segments. \label{fig:arch}}
+\caption{\todo{name} architecture. We use a pre-trained CNN to featurize raw video data for use in segmentation. After featurization, we combine the data with kinematic data and apply a Transition State Clustering algorithm to identify segments.}
+\figlabel{arch}
 \vspace{-1em}
 \end{figure}
 \fi

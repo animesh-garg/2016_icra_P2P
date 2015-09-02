@@ -32,8 +32,11 @@ defined as a clustering of the set of transition states across all demonstration
 \]
 Every $U_i$ can be represented as a sequence of integers indicating that transition states assignment to one of the transition state clusters $U_i=[1,2,4,2]$.
 
-We assume, demonstrations are \emph{consistent}, meaning there exists a non-empty sequence of transition states $\mathcal{U}^*$ such that the partial order defined by the elements in the sequence (i.e., $s_1$ happens before $s_2$ and $s_3$) is satisfied by every $U_i$. For example, 
-\[U_1 = [1,3,4]\text{, }U_2 = [1,1,2,4]\text{, }\mathcal{U}^*=[1,4] \]
+We assume, demonstrations are \emph{consistent}, meaning there exists a non-empty sequence of transition states $\mathcal{U}^*$ such that the partial order defined by the elements in the sequence (i.e., $s_1$ happens before $s_2$ and $s_3$) is satisfied by every $U_i$. For example,
+\begin{align*} 
+U_1 = [1,3,4]\text{, }U_2 = [1,1,2,4], \quad & \mathcal{U}^*=[1,4]\\ U_1 = [1,2,3,4]\text{, }U_2 = [1,3,2,4], \quad & \mathcal{U}^*=[1,4]
+\end{align*}
+% \[U_1 = [1,3,4]\text{, }U_2 = [1,1,2,4], \quad \mathcal{U}^*=[1,4]\]
 A counter example,
 \[U_1 = [1,3,4]\text{, }U_2 = [2,5]\text{, }\mathcal{U}^*\text{  no solution} \]
 Intuitively, this condition states that there have to be a consistent ordering of actions over all demonstrations up to some additional regimes (e.g., spurious actions). 
@@ -47,8 +50,8 @@ In case of multiple modes in an action sequence, we find the minimal consistent 
 \begin{figure}[t!]
 \centering
 \includegraphics[width=\linewidth]{figures/pgm.pdf}
-\caption{\todo{placeholder} (1) A finite-state Hidden Markov Chain with Gaussian Mixture Emissions (GMM+HMM) , and (2) TSC model. TSC uses Dirchilet Process Priors and the concept of transition states to learn a robust segmentation. }
-\label{fig:tsc-pgm}
+\caption{\todo{placeholder} (1) A finite-state Hidden Markov Chain with Gaussian Mixture Emissions (GMM+HMM) , and (2) TSC model. TSC uses Dirchilet Process Priors and the concept of transition states to learn a robust segmentation.\todo{fix notation in graph} }
+\label{fig:pgm}
 \vspace{-10pt}
 \end{figure}
 
@@ -83,12 +86,13 @@ The result of the pruning and clustering is a set of transition state clusters.
 
 \subsection{Local Linearity of Visual Features}
 
-\begin{figure}[t!]
+We next describe why this model is still justified for the augmented state $\binom{k(t)}{z(t)}$.
+In Figure \ref{fig:imgtraj}, for a single trajectory from one of our experimental datasets, we plot a 2D PCA visualization of the features from convolutional layer (\texttt{conv4}) of the pre-trained AlexNet architecture. We use a sub-sequence of the full task and sub-sample the data at 10 fps and for each frame, we add a point to the visualization, illustrating the trajectory in feature space. It is worth noting that the visual features follow a smooth trajectory even in the high dimensional visual space, supporting the assumptions of local linearity made by our model for identifying changepoints.
+
+
+\begin{figure}[ht!]
 \centering
 \includegraphics[width=0.7\linewidth]{figures/pca_conv4.png}
 \caption{The figure visualizes the PCA projection of 64,896 dimensional output from \texttt{conv4} of the Alexnet for a sub-sequence of the suturing task video sub-sampled at 10 fps. The points are colored according to time from blue to red. We note that the visual features follow a smooth trajectory even in the high dimensional visual space.   \label{fig:imgtraj}}
 \vspace{-10pt}
 \end{figure}
-
-We next describe why this model is still justified for the augmented state $\binom{k(t)}{z(t)}$.
-In Figure \ref{fig:imgtraj}, for a single trajectory from one of our experimental datasets, we plot a 2D PCA visualization of the features from convolutional layer (\texttt{conv4}) of the pre-trained AlexNet architecture. We use a sub-sequence of the full task and sub-sample the data at 10 fps and for each frame, we add a point to the visualization, illustrating the trajectory in feature space. It is worth noting that the visual features follow a smooth trajectory even in the high dimensional visual space, supporting the assumptions of local linearity made by our model for identifying changepoints.
