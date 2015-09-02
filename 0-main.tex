@@ -1,13 +1,19 @@
 \documentclass[letterpaper, 10 pt, conference]{ieeeconf}
 
+
 %\let\labelindent\relax
 \input{preamble}
 \usepackage{blindtext}
 
+\newboolean{include-notes}
+\setboolean{include-notes}{true}
+\newcommand{\fp}[1]{\ifthenelse{\boolean{include-notes}}%
+ {\textcolor{blue}{\textbf{FP: #1}}}{}}
 %===============================================================
 \title{\LARGE \bf
-Pixels to Primitives: Learning Sub-Task Level Semantic Segmentation \\
-of Multi-Step Task Trajectories from Video with Deep Learning }
+Learning Sub-Task Level Semantic Segmentation of Multi-Step Task Trajectories from Video with Deep Learning
+\\{\color{blue} V0.2 Wed 09-02-2015 11:05am}
+}
 % Pixels to Primitives (P2P)
 
 \author{%
@@ -25,11 +31,18 @@ Adithyavairavan Murali*, Animesh Garg*, Sanjay Krishnan*, Florian Pokorny, Piete
 \maketitle
 
 \begin{abstract}
-Segmentation is an important first step in analyzing long running robotic tasks. For reliable results, it is important to consider both visual and kinematic data, as visual data provides important information about the state of the workspace. 
+    
+Segmentation 
+\fp{let's disambiguate: temporal segmentation?}
+is an important first step in analyzing long running robotic tasks. For reliable results, it is important \fp{too strong
+    assertion - incorporate Ken's feedback on this. I.e. relationship to previous work, factual statement of what we
+investigate } to consider both visual and kinematic data, as visual data provides important 
+information about the state of the workspace. \fp{avoid such statements - we investigate this} 
 Existing unsupervised segmentation methodologies are limited in the ways they can leverage visual data and rely on annotations or complete knowledge of all objects in the world. In this paper, we propose a framework that takes a step towards unsupervised segmentation of robotic demonstrations using raw video (i.e., pixel data). 
 We identify key transition events in kinematic data, cluster transitions together using visual data, and then identify segments of the raw video corresponding to these clusters of transition events. 
 The resulting video segments can be used to design error recovery actions, parameter tuning, action classification, 
-and operator skill assessment. 
+and operator skill assessment.\fp{overstatement, instead list experimental contributions only and that we extend your
+ISRR work} 
 \todo{Our results on x suggest y}
 \end{abstract} 
 

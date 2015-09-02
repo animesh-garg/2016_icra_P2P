@@ -4,21 +4,29 @@
 \begin{figure*}[!t]
 \centering
 \includegraphics[width=0.7\linewidth]{figures/system_architecture_2.png}
-\caption{\todo{re-draw} The figure illustrates the steps in our approach to perform seub-task level segmentation of task demonstrations without labels.}
+\caption{\todo{re-draw} 
+The figure illustrates the steps in our approach to perform seub-task level segmentation of task demonstrations without labels.
+{\color{blue}shrink to one column if readable}
+}
 \label{fig:pipeline}
 \vspace{-10pt}
 \end{figure*}
 
 \subsubsection{Learning From Demonstrations}
-Learning from demonstrations uses segmentation to discretize action spaces (skill-learning) which allows for efficient learning of complex tasks~\cite{ijspreet2002learning,pastor2009learning}.
+Learning from demonstrations uses segmentation to discretize action spaces (skill-learning) 
+\fp{cite springer handbook of robotics which has a nice chapter on LfD, 
+    also not all learning from segmentation is concerned with segmentation 
+    - many only work under the assumption that motion is already segmented}
+which allows for efficient learning of complex tasks~\cite{ijspreet2002learning,pastor2009learning}.
 This line of work largely focuses on pre-defined primitives.
 Niekum et al. \cite{niekum2012learning} proposed an unsupervised extension to the motion primitive model by learning a set of primitives using the Beta-Process Autoregressive Hidden Markov Model (BP-AR-HMM).
 The work by Niekum et al. does incorporate visual information, however, it does not use visual information to actually find segments.
-Post segmentation,  Niekum et al. uses AR markers to estimate object poses of all of the objects in the workspace.
+\fp{Instead, N et al use visual information for...} Post segmentation,  Niekum et al. uses AR markers to estimate object poses of all of the objects in the workspace.
 The segments, discovered with kinematics alone, are then specified in each objects reference frame.
 When the objects are then moved, the trajectory can be transferred using a Dynamic Motion Primitive model.
 
-Calinon et al.~\cite{calinon2014skills, calinon2014task, calinon2010learning} characterizes segments from demonstrations as skills that can be used to parametrize imitation learning.
+Calinon et al.~\cite{calinon2014skills, calinon2014task, calinon2010learning} \fp{I think A. Billard is another key
+leader here} characterizes segments from demonstrations as skills that can be used to parametrize imitation learning.
 In this line work, the authors apply Gaussian Mixture Models (GMMs) to cluster observations from the same mixture component.
 A number of other works have leveraged this model for segmentation e.g., \cite{konidaris2009efficient, konidaris2011robot, subramanian2011learning}.
 While this work does not use vision, many of the salient ideas and models are highly relevant to this paper.
@@ -26,7 +34,9 @@ As we will later describe, Gaussian Mixture Models have a duality with switched 
 In this paper, we will provide experimental evidence that suggests after appropriate dimensionality reduction visual features are similar to locally linear trajectories.
 
 \subsubsection{Surgical Robotics}
-A domain of particular interest is surgical robotics which has a number of challenges that make segmentation difficult (see Krishnan et al. \cite{krishnan2015tsc}).
+A domain of particular interest is surgical robotics which has a number of challenges that make segmentation difficult 
+\fp{vague. Instead: where segmentation is challenging due to X, Y, Z (cite).}
+(see Krishnan et al. \cite{krishnan2015tsc}).
 In our prior work, we explored automation of surgical subtasks \cite{murali2015learning} using a learning by observation framework. 
 A key step in this pipeline was building a finite state machine for automation, requiring us to decompose the complex task into a small number of discrete task states.
 A natural problem was to automatically segment these demonstrations algorithmically \cite{krishnan2015tsc}.
@@ -47,7 +57,9 @@ Jones et al. \cite{jones2014unsupervised} restricts their segmentation to learni
 Yang et al. \cite{yang2013discovering} and Wu et al.  \cite{wu2015watch} use k-means to learn a dictionary of primitive motions, however, in prior work, we found that \sys outperforms a standard k-means segmentation approach.
 In fact, the model that we propose is complementary to these works and \sys would be a robust drop-in-replacement for the k-means dictionary learning step.
 The approach taken by Di Wu et al. is to parametrize human actions using a skeleton model, and they learn the parameters to this skeleton model using a deep neural network.
-In this work, we explore using generic deep visual features for robotic segmentation without requiring task-specific optimization such as skeleton or action models using in human action recognition.
+In this work, we explore using generic deep visual features for robotic segmentation without requiring task-specific
+optimization such as skeleton or action models using in human action recognition. \fp{The whole Deep learning aspect
+needs to be more promionent earlier on as key enabling factor}
 
 \subsubsection{Deep Features Robotics}
 Robotics is increasingly using deep features for visual sensing. For example, Lenz et al. uses pre-trained neural networks for object detection for grasping \cite{lenz2015deep}.
@@ -57,7 +69,7 @@ We believe that segmentation is an important first step in a number of robot lea
 In our experiments, we numerate a number of different design choices and show how that a suboptimal (but ostensibly sensible) choice of features results in a factor of 3x less accuracy.
 
 \subsection{Trajectory Segmentation Models}
-There are a number of different ways to formalize segmentation, and we overview some of the prior work (including ours) to contextualize the results in the rest of the paper.
+There are a number of different ways to formalize segmentation, and we overview \fp{`review' or `provide an overview'} some of the prior work (including ours) to contextualize the results in the rest of the paper.
 Many unsupervised segmentation models either implicitly or explicitly model the dynamics as locally linear.
 It is important to note that locally linear dynamics does not imply linear motions, as spiraling motions can be represented as linear systems. 
 In \cite{elhamifar2009sparse}, videos are modeled as transitions on a lower-dimensional linear subspace and segments are defined as changes in these subspaces.

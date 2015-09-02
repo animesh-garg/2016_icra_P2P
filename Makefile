@@ -1,4 +1,4 @@
-FILE = 0-main 
+FILE = 0-main.tex 
 #FILE = paper-disclaimer
 
 pdf: *.tex
