@@ -1,3 +1,4 @@
+
 \begin{algorithm}[t!]
 \small
 \DontPrintSemicolon
@@ -45,10 +46,11 @@
     \nl\KwRet{$\mathcal{T}_i,\enspace \forall \, d_i \in \mathcal{D}$}
 % }
 \label{alg:vtsc}
+% \vspace*{-10pt}
 \end{algorithm}
 
 \section{Visual Transition State Clustering}
-We present the \tsc algorithm in Algorithm~\ref{alg:vtrc}.
+We present the \tsc algorithm in Algorithm~\ref{alg:vtsc}.
 In this section, we overview the extensions to the previously proposed TSC algorithm~\cite{krishnan2015tsc}.
 
 \subsection{Visual Features}
@@ -123,47 +125,16 @@ In our prior work, we used the concatenation of kinematic and visual features at
 We empirically found that the use of $[k(t-1), k(t), k(t+1)]^T$ as the kinematic state representation led to improved segmentation accuracy. Other lengths of temporal history were experimented with as shown in Figure~\todo{add figure}.
 
 \subsubsection{Skill-Weighted Pruning} 
-Different demonstrators often have different skill levels, and we extend our prior work to prune transition states in a weighted way.
-$w_i$ is weight for each demonstration $d_i \in \mathcal{D}$, such that $w_i \in [0,1]$ and $\hat{w}_i = \frac{w_i}{\sum w_i}$. Then a cluster $C_{kk'}$ is pruned if: 
+Different demonstrators often have different skill levels, and we extend our prior work to prune transition states in a weighted manner.
+Let, $w_i$ be the weight for each demonstration $d_i \in \mathcal{D}$, such that $w_i \in [0,1]$ and $\hat{w}_i = \frac{w_i}{\sum w_i}$. Then a cluster $C_{kk'}$ is pruned if it does not contain points from at least $\rho$ fraction of demonstrations. This converts to:
 \[\sum_{d_i} \hat{w}_i\mathbbm{1}\Big( \sum_{n:N(n)\in d_i} \mathbbm{1}( CP(n) \in C_{kk'}) \geq 1 \Big) \leq \rho 
 \]
 
+
 \subsubsection{Robust Temporal Clustering}
-In our prior work, we used a hierarchical application of DP-GMM first clustering spatially and then temporally. 
-In this work, we explore a more robust variant of this approach.
+In our prior work, we used a hierarchical application of DP-GMM first clustering spatially and then temporally. In this work, we explore a more robust variant of this approach.
 We iteratively hold out one out of the $N$ demonstrations and apply \tsc to the remaining demonstrations.
-Then, over $N$ runs of $\tsc$, we temporally cluster the centroids of the transition state clusters.
+Then, over $N-1$ runs of \tsc, $N-1$ predictions are made for each $d_i \in \mathcal{D}$. We temporally cluster the transitions across $N-1$ predictions, to estimate final transition state centroid and variance. This step is illustrated in step 20-21 of Algorithm~\ref{alg:v.tsc}.
+% the centroids of the transition state clusters.
 
 % \vspace{0.5em}
-
-
-
-
-
-
-% ==============================================
-
-% \begin{algorithm}[t]
-% \caption{The Transition State Clustering Algorithm \todo{Fix with changes} \label{algotext}}
-% % \begin{algorithmic}[1]
-% \scriptsize
-% \State \textsf{Input: } $\mathcal{D}$, $\rho$ pruning parameter, and $\delta$ compaction parameter.
-
-% \State $n(t) = \binom{\mathbf{x}(t+1)}{\mathbf{x}(t)}$. 
-
-% \State Cluster the vectors $n(t)$ using DP-GMM assigning each state to its most likely cluster. 
-
-% \State \emph{Transition states} are times when $n(t)$ is in a different cluster than $n(t+1)$. 
-
-% \State Remove states that transition to and from clusters with less than a fraction of $p$ demonstrations. 
-
-% \State Remove consecutive transition states when the L2 distance between these transitions is less than $\delta$. 
-
-% \State Cluster the remaining transition states in the state space $\mathbf{x}(t+1)$ using DP-GMM.
-
-% \State Within each state-space cluster, sub-cluster the transition states temporally. 
-
-% \State \textsf{Output: } A set $\mathcal{M}$ of clusters of transition states and the associated with each cluster a time interval of transition times.
-% % \end{algorithmic}
-% \end{algorithm}
-
