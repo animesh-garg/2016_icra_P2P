@@ -1,0 +1,9 @@
+\section{Conclusion}
+Segmentation of demonstrations of a multistep task is an important first step in number of robot learning applications.
+In this work, we explore unsupervised segmentation with task-agnostic features by applying new results in Deep Learning.
+we \emph{automatically} construct visual features using pre-trained CNNs applied to frames of video recordings; thus constructing a high-dimensional trajectory that augments the kinematic state-space.
+We apply the transition state clustering algorithm to learn clusters of states across all demonstrations that mark dynamical system regime switches.
+\todo{??}
+In a synthetic example, we find that \tsc finds an accurate segmentation under kinematic noise, control noise, and partial observability by using visual features. 
+We evaluate these results on three datasets: surgical suturing, surgical needle passing, and assembly with the PR2.
+Our results suggest that \tsc finds \todo{x\%} tighter clusters in comparison to using kinematics alone.

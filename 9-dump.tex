@@ -1,4 +1,5 @@
 \section{Latent State $H_t$}
+\todo{****  THIS IS DUMP FILE *****}
 Describe the process of linking kinematics and video (PCA, CCA, etc.).
 If we apply any VLAD or encoding, or batching, describe it here:
 
@@ -20,3 +21,16 @@ VLAD was shown to perform better than Fisher vectors and average pooling for enc
 \end{itemize}
 
 \end{itemize}
+
+
+
+%%%% TABLE 1
+                 & Z             &              &               & k+Z          &              &              \\ \hline
+                 & CCA           & GRP          & PCA           & CCA          & GRP          & PCA          \\ \hline \hline
+SIFT             &          -     &        -     & -0.113$\pm$0.016 & -            & -            & 0.284$\pm$0.122 \\ \hline
+AlexNet conv3    & -0.013$\pm$0.012 & 0.117$\pm$0.035 & 0.200$\pm$0.024  & 0.272$\pm$0.112 & 0.281$\pm$0.119 & 0.267$\pm$0.120 \\ \hline
+AlexNet conv4    & -0.025$\pm$0.009 & 0.135$\pm$0.013 & 0.213$\pm$0.007  & 0.294$\pm$0.114 & 0.277$\pm$0.134 & 0.273$\pm$0.102 \\ \hline
+AlexNet pool5    & -0.029$\pm$0.023 & 0.129$\pm$0.016 & 0.197$\pm$0.009  & 0.281$\pm$0.134 & 0.258$\pm$0.102 & 0.276$\pm$0.128 \\ \hline
+VGG conv5\_3     & -0.012$\pm$0.025 & 0.141$\pm$0.010 & \textbf{0.273$\pm$0.018}  & 0.247$\pm$0.099 & 0.287$\pm$0.138 & 0.325$\pm$0.113 \\ \hline
+VGG LCDVLAD     & 0.046$\pm$0.020  & 0.012$\pm$0.002 & 0.068$\pm$0.023  & 0.294$\pm$0.088 & 0.331$\pm$0.088 & 0.224$\pm$0.056 \\ \hline
+AlexNet LCD VLAD & 0.068$\pm$0.035  & 0.033$\pm$0.001 & -0.063$\pm$0.053 & 0.285$\pm$0.092 & 0.308$\pm$0.098 & 0.243$\pm$0.102 \\ 

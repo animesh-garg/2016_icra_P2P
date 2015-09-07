@@ -1,31 +1,169 @@
-\section{Our Approach: Hierarchical Dirichlet  Clustering}
-Describe the clustering procedure--refer to ISRR when needed.
-
-\begin{algorithm}[t]
-\caption{The Transition State Clustering Algorithm \todo{Fix with changes} \label{algotext}}
-\begin{algorithmic}[1]
-\scriptsize
-\State \textsf{Input: } $\mathcal{D}$, $\rho$ pruning parameter, and $\delta$ compaction parameter.
-
-\State $n(t) = \binom{\mathbf{x}(t+1)}{\mathbf{x}(t)}$. 
-
-\State Cluster the vectors $n(t)$ using DP-GMM assigning each state to its most likely cluster. 
-
-\State \emph{Transition states} are times when $n(t)$ is in a different cluster than $n(t+1)$. 
-
-\State Remove states that transition to and from clusters with less than a fraction of $p$ demonstrations. 
-
-\State Remove consecutive transition states when the L2 distance between these transitions is less than $\delta$. 
-
-\State Cluster the remaining transition states in the state space $\mathbf{x}(t+1)$ using DP-GMM.
-
-\State Within each state-space cluster, sub-cluster the transition states temporally. 
-
-\State \textsf{Output: } A set $\mathcal{M}$ of clusters of transition states and the associated with each cluster a time interval of transition times.
-\end{algorithmic}
+\begin{algorithm}[t!]
+\small
+\DontPrintSemicolon
+\caption{\textbf{\TSC:} Visual-Transition State Clustering}
+\KwData{Set of demonstrations:$\mathcal{D}$, $\rho$ pruning parameter}
+\KwResult{Set of Predicted Transitions  $\mathcal{T}_i,\enspace \forall \, d_i \in \mathcal{D}$}
+% \Begin{
+    \ForEach{$d_i \in \mathcal{D}$}{
+        $z_i \gets$ VisualFeatures $(d_i, params)$\;
+        $k_i \gets$ KinematicFeatures $(d_i, params)$\;
+        %  {\scriptsize  \tcp*[l]{concatenate kinematic and visual features}}
+        $\mathbf{x}_i(t) \gets \binom{\mathbf{k_i}(t+1)}{\mathbf{z_i}(t)}\ \forall t \in \{1,\ldots, T_i\}$\;
+        $\bar{x}_i(t) \gets \big[\, \mathbf{x}(t+1)^T, \ \mathbf{x}(t)^T, \ \mathbf{x}(t-1)^T \,\big]^T, \ \forall t$\;
+        $N \gets \big[N^T, \bar{x}_i(1)^T,\ldots,\bar{x}_i(T_i)^T\big]^T$\;
+    }
+    {\scriptsize  \tcp*[l]{Cluster to get Change Points}}
+    $\mathcal{C}^{CP} = \textnormal{DPGMM}(N, \alpha_0)$ {\scriptsize  \tcp*[r]{$\alpha_0$ is hyperparameter}}
+    \ForEach{$N(n)\in\mathcal{C}^{CP}_{i},\ N(n+1)\in\mathcal{C}^{CP}_{j},i\neq j$ } {$CP \gets CP \cup \{N(n)\}$}
+    {\scriptsize  \tcp*[l]{Cluster over Kinematic Feature Subspace}}
+    $\mathcal{C}_{1} = \textnormal{DPGMM}(CP, \alpha_1)$ {\scriptsize  \tcp*[r]{$\mathcal{C}_{1}$: set of clusters}}
+    %  \ForEach{$C^{1}_k \in \mathcal{C}^{1}$}{
+    %     \uIf{$\sum_{d_i} \mathbbm{1}\Big( \sum_{n:N(n)\in d_i} \mathbbm{1}( CP(n) \in C^{1}_k) \geq 1 \Big) \geq \rho |\mathcal{D}|$}{
+    %     $\mathcal{C}^{1}\gets \mathcal{C}^{1}\setminus \mathcal{C}^{1}_k$ {\scriptsize  \tcp*[r]{Cluster Pruning}}
+    %     }
+    %  }
+    \ForEach{$C_{k} \in \mathcal{C}_{1}$}{
+        $CP(C_{k}) \gets \{CP(n) \in C_{k}, \forall n \in \{1,\ldots,|CP|\}\}$\;
+        {\scriptsize  \tcp*[l]{Cluster over Visual Feature Subspace}}
+        $\mathcal{C}_{k2} \gets \textnormal{DPGMM}(CP(C_{k}), \alpha_2)$\;
+        \ForEach{$C_{kk'} \in \mathcal{C}_{k2}$}{
+            \If{$\sum_{d_i} \mathbbm{1}\Big( \sum_{n:N(n)\in d_i} \mathbbm{1}( CP(n) \in C_{kk'}) \geq 1 \Big) \leq \rho |\mathcal{D}|$}
+            {$\mathcal{C}_{k2}\gets \mathcal{C}_{k2}\setminus \{C_{kk'}\}$ {\scriptsize \tcp*[r]{Cluster Pruning}}
+            }
+            {\scriptsize \tcp*[l]{collect intra-cluster transitions}}
+            $T_i \gets T_i \cup \{CP(n) \in C^{kk'}, \forall n:N(n)\in d_i\}$\;
+        }
+    }
+    {\scriptsize  \tcp*[l]{Cluster over time to predict Transition Windows}}
+    \ForEach{$d_i \in \mathcal{D}$}{
+        Repeat steps 1-17 for $\mathcal{D}' = \mathcal{D} \setminus d_i$\;
+        $\mathtt{T}_j \gets \mathtt{T}_j \cup T_j^{(i)}, \ \{\forall\ j: d_j \in \mathcal{D}'\}${\scriptsize \tcp*[r]{$T_j^{(i)}$: \textit{i}th iteration}} 
+        % $\mathcal{T}_i \gets DPGMM (\mathtt{T}, \alpha_4)${\scriptsize  \tcp*[r]{store cluster $\mu$ and $\Sigma$}}
+    }
+    \lForEach{$d_i \in \mathcal{D}$}{$\mathcal{T}_i \gets DPGMM (\mathtt{T}_i, \alpha_4)$}
+    \nl\KwRet{$\mathcal{T}_i,\enspace \forall \, d_i \in \mathcal{D}$}
+% }
+\label{alg:vtsc}
 \end{algorithm}
 
-\noindent \todo{Changes to Algorithm}\\
--- Skill Weighted Pruning\\
--- Final Time Clustering over k-folds to regularization
+\section{Visual Transition State Clustering}
+We present the \tsc algorithm in Algorithm~\ref{alg:vtrc}.
+In this section, we overview the extensions to the previously proposed TSC algorithm~\cite{krishnan2015tsc}.
+
+\subsection{Visual Features}
+The first step in our extension is to define an augmented state space $\mathbf{x}(t) = \binom{k(t)}{z(t)}$, where $k(t)$ are the kinematic features and $z(t)$ are the visual features.
+We use layers from a pre-trained Convolutional Neural Network (CNNs) to derive the features frame-by-frame.
+CNNs are increasingly popular for image classification and as a result a number of image classification CNNs exist which are trained on terabytes of natural images.
+Intuitively, CNNs are trained to classify based on aggregations (pools) of hierarchical convolutions of the pixels.
+Removing the aggregations and the classifiers, results in convolutional filters which can be used to derive features.
+
+However, we found that to use these features required a number of pre-processing and post-processing steps; in addition to a number of design choices within the CNN itself like what layer in the convolutional hierarchy to use.
+
+\subsubsection{Pre-processing}
+As the image classification CNNs are trained on static images, their features are optimized for identifying salient edges and colors.
+Since these features are not temporal, they do not differentiate between robot and workspace features.
+Furthermore, since we aggregate across demonstrations, we need to ensure that these features are largely consistent.
+To avoid variance due to extraneous objects and small changes in lighting, we first pre-processed the videos.
+
+We first cropped all videos by equal amounts to capture only the workspace where most of the robot manipulation happened. 
+Then, they were rescaled to 640 x 480 dimensions with normalization to have a zero mean RGB value as standard \cite{krizhevsky2012imagenet,simonyan2014very}. 
+Finally, for computational reasons, the videos were downsampled to \todo{x} frame per second.  
+All of pre-processing happened with the open source program \texttt{ffmpeg}.
+
+\subsubsection{Visual Featurization}
+Once the images were pre-processed, we applied the convolutional filters from the pre-trained neural networks. In particular, we explore two architectures.
+
+\vspace{0.25em}
+\noindent\textbf{AlexNet: } Krizhevsky et al. proposed a convolutional neural network architecture for image classification \cite{krizhevsky2012imagenet}. This architecture was seminal as it proposed multiple stacked convolutional filters (5 in all).   
+
+\vspace{0.25em}
+\noindent\textbf{VGG: } Simoyan et al. proposed an alternative architecture termed VGG which increased the number of convolutional layers significantly (16 in all) \cite{simonyan2014very}.
+
+\vspace{0.25em}
+
+In this work, we explore selecting convolutional features from different layers in the hierarchy. 
+This problem is called transfer learning and has been well studied \todo{cite}.
+It is established that earlier layers in the hierarchy give more general features while later layers give more specific ones.
+In our experiments, we explore the level of generality of features required for segmentation. 
+We also compare these features to other visual featurization techniques such as SIFT and SURF.
+
+\subsubsection{Post-Processing: Encoding}
+After constructing these features, the next step is encoding the results of the convolutional filter into a vector $z(t)$.
+We explore three encoding techniques: (1) raw values, (2) VLAD, and (3) LCD.
+
+\vspace{0.25em}
+\noindent\textbf{Raw Filter Values: } The first encoding technique that we explore is using the raw convolutional filter values. We stack these values into a vector which constructs $z(t)$.
+
+\vspace{0.25em}
+\noindent\textbf{Vector of Locally Aggregated Descriptors (VLAD)\cite{arandjelovic2013all}: }
+Vector of Locally Aggregated Descriptors (VLAD) image encoding as proposed by is a feature encoding and pooling method. 
+It transforms an incoming variable-size set of independent samples into a fixed size vector representation.
+VLAD encodes a set of local feature descriptors $I=\{x_1,\ldots,x_n\}$ extracted from an image using a code book $\mathrm{C} = \{c_1, \ldots, c_K \}$ built using a clustering method. With K-coarse cluster centers, generated by K-means, we can obtain the difference vector for every center $c_j$ as:\vspace{-5pt}
+\[ u_k = \sum_{i:\,1\text{-}nbd(x_i)=\{c_j\}} (x_i- c_j)
+\]
+where $k\text{-}nbd(x_i)$ indicates k(=1) nearest neighbors of $x_i$ among K coarse centers.
+VLAD vector is obtained by concatenating $u_k$ over all the K centers, $V = [u_1^T, \ldots, u_K^T]$, with $V$ of size K$D$ where $D$ is the dimension of incoming points $x_i$. 
+
+\vspace{0.25em}
+\noindent\textbf{Latent Concept Descriptors (LCD) \cite{xu2014discriminative}: }
+Convolutional layers contain important spatial information, however at the cost of high dimensional representation. For instance the feature dimension at a convolutional layer can be $c\times c \times M$, where $c$ is filter size and $M$ is number of filters. However using the latent concept descriptors, a layer of size $c\times c \times M$ can be converted into $c^2$ latent concept descriptors with M dimensions. Each latent concept descriptor represents the responses from the M filters for a specific pooling location. 
+
+\subsubsection{Post-Processing: Dimensionality Reduction}
+After encoding, we feed the features $z(t)$ through a dimensionality reduction process.
+This is for computational reasons as the visual features are very high dimensional and the Transition State Clustering algorithm suffers from the curse of dimensionality.
+Furthermore, almost all GMM-based clustering algorithms converge to a local minima and very high dimensional feature spaces can lead to numerical instability or inconsistent behavior.
+Principal Component Analysis (PCA) is widely applied in computer vision. 
+We explore alternative dimensionality reduction techniques to find desirable properties of the dimensionality reduction that result in improve segmentation performance.
+In particular, we explore Gaussian Random Projections (GRP), and Canonical Correlation Analysis (CCA).
+
+\subsection{Other Extensions}
+\subsubsection{Sliding Window States}
+In our prior work, we used the concatenation of kinematic and visual features at a given time $t$ as the state representation $\binom{k(t)}{z(t)}$. However, the use of rolling time window in both kinematics and visual space allows capturing dynamics. 
+We empirically found that the use of $[k(t-1), k(t), k(t+1)]^T$ as the kinematic state representation led to improved segmentation accuracy. Other lengths of temporal history were experimented with as shown in Figure~\todo{add figure}.
+
+\subsubsection{Skill-Weighted Pruning} 
+Different demonstrators often have different skill levels, and we extend our prior work to prune transition states in a weighted way.
+$w_i$ is weight for each demonstration $d_i \in \mathcal{D}$, such that $w_i \in [0,1]$ and $\hat{w}_i = \frac{w_i}{\sum w_i}$. Then a cluster $C_{kk'}$ is pruned if: 
+\[\sum_{d_i} \hat{w}_i\mathbbm{1}\Big( \sum_{n:N(n)\in d_i} \mathbbm{1}( CP(n) \in C_{kk'}) \geq 1 \Big) \leq \rho 
+\]
+
+\subsubsection{Robust Temporal Clustering}
+In our prior work, we used a hierarchical application of DP-GMM first clustering spatially and then temporally. 
+In this work, we explore a more robust variant of this approach.
+We iteratively hold out one out of the $N$ demonstrations and apply \tsc to the remaining demonstrations.
+Then, over $N$ runs of $\tsc$, we temporally cluster the centroids of the transition state clusters.
+
+% \vspace{0.5em}
+
+
+
+
+
+
+% ==============================================
+
+% \begin{algorithm}[t]
+% \caption{The Transition State Clustering Algorithm \todo{Fix with changes} \label{algotext}}
+% % \begin{algorithmic}[1]
+% \scriptsize
+% \State \textsf{Input: } $\mathcal{D}$, $\rho$ pruning parameter, and $\delta$ compaction parameter.
+
+% \State $n(t) = \binom{\mathbf{x}(t+1)}{\mathbf{x}(t)}$. 
+
+% \State Cluster the vectors $n(t)$ using DP-GMM assigning each state to its most likely cluster. 
+
+% \State \emph{Transition states} are times when $n(t)$ is in a different cluster than $n(t+1)$. 
+
+% \State Remove states that transition to and from clusters with less than a fraction of $p$ demonstrations. 
+
+% \State Remove consecutive transition states when the L2 distance between these transitions is less than $\delta$. 
+
+% \State Cluster the remaining transition states in the state space $\mathbf{x}(t+1)$ using DP-GMM.
+
+% \State Within each state-space cluster, sub-cluster the transition states temporally. 
+
+% \State \textsf{Output: } A set $\mathcal{M}$ of clusters of transition states and the associated with each cluster a time interval of transition times.
+% % \end{algorithmic}
+% \end{algorithm}
 

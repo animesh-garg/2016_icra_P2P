@@ -15,16 +15,15 @@
 %Math Stuff
 \usepackage{mathtools}
 \usepackage{amsmath, amssymb, amscd}
+\usepackage{bbm} %to support numbers in mathbb
 %\usepackage{ wasysym } %special symbols
 \usepackage{amsfonts}
 \usepackage{mathptmx}       % selects Times Roman as basic font
 \DeclareMathAlphabet{\mathcal}{OMS}{lmsy}{m}{n}
 \DeclareSymbolFont{largesymbols}{OMX}{cmex}{m}{n}
-\usepackage{algorithm}
-\usepackage{algorithmicx}
-%\usepackage{algorithm}
-%\usepackage{algpseudocode}
-% \usepackage[ruled,vlined,linesnumbered]{algorithm2e}
+% \usepackage{algorithm}
+% \usepackage{algorithmicx,algpseudocode}
+\usepackage[ruled,vlined,linesnumbered]{algorithm2e}
 \usepackage{ textcomp } %for getting text tilde
 
 %Table Stuff
@@ -61,7 +60,7 @@
 \g@addto@macro{\UrlBreaks}{\UrlOrds}
 \makeatother
 \usepackage{color}
-\usepackage[usenames,dvipsnames, table]{xcolor}
+\usepackage[usenames,dvipsnames,table,xcdraw]{xcolor}
 \usepackage[pdfborder={0 0 0.5}]{hyperref}
 \hypersetup{
     colorlinks=true,
@@ -74,9 +73,10 @@
 
 %=======U S E R  D E F I N E D  M A C R O S=======
 % \newcommand{\bibhref}[2]{#2}
-\newcommand{\todo}[1]{\textcolor{red}{[ToDo:#1]}}
+\newcommand{\todo}[1]{\textcolor{red}{[?#1?]}}
 \newcommand{\tocite}[1]{\textcolor{red}{[cite]}}
-\newcommand{\ignore}[1]{}
+\newcommand{\del}[1]{}
+\newcommand{\etal}[1]{et al.}
 
 % Usage:
 % \figlabel{myfigure} creates \label{fig:myfigure}

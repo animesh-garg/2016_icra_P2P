@@ -3,48 +3,66 @@
 %\let\labelindent\relax
 \input{preamble}
 \usepackage{blindtext}
+% Macro for Algorithm Name 
+\newcommand{\TSC}{V-TSC\xspace}
+\newcommand{\tsc}{V-TSC\xspace}
+\newcommand{\sys}{\textsf{TSC+VIS}\xspace}
 
+\newboolean{include-notes}
+\setboolean{include-notes}{true}
+\newcommand{\fp}[1]{\ifthenelse{\boolean{include-notes}}%
+ {\textcolor{blue}{\textbf{FP: #1}}}{}}
 %===============================================================
+%\title{\LARGE \bf
+%Pixels to Primitives: Learning Sub-Task Level Semantic Segmentation \\
+%of Multi-Step Task Trajectories from Video with %Deep Learning\\
+%{\textcolor{blue}{[v0.2, \today\,\currenttime]}} }
 \title{\LARGE \bf
-Pixels to Primitives: Learning Sub-Task Level Semantic Segmentation \\
-of Multi-Step Task Trajectories from Video with Deep Learning }
+Visual Transition State Clustering: Using Deep Learning to Featurize Multi-Modal Trajectories For Unsuperivsed Segmentation \\
+{\textcolor{blue}{[v0.2, \today\,\currenttime]}} }
 % Pixels to Primitives (P2P)
 
 \author{%
-Adithyavairavan Murali*, Animesh Garg*, Sanjay Krishnan*, Florian Pokorny,\\ 
-Pieter Abbeel, Trevor Darrell, Ken Goldberg \quad {\textcolor{blue}{[v0.1, \today\,\currenttime]}}
-\thanks{\hrule \vspace{5pt} * The authors contributed equally to the paper}%
+Adithyavairavan Murali*, Animesh Garg*, Sanjay Krishnan*,\\ Florian Pokorny,
+Pieter Abbeel, Trevor Darrell, Ken Goldberg 
+\thanks{\hrule \vspace{5pt} * These authors contributed equally to the paper}%
 \thanks{EECS \& IEOR, University of California, Berkeley CA USA; \texttt{\{adithya\_murali, animesh.garg, sanjaykrishnan, ftpokorny, pabbeel, trevor, goldberg\}@berkeley.edu}}%
 % \thanks{$^{1}$EECS, University of California, Berkeley; {\{sanjaykrishnan, adithya\_murali\}@berkeley.edu}}%
 % \thanks{$^{2}$IEOR and EECS, University of California, Berkeley; {\{animesh.garg, goldberg\}@berkeley.edu}}%
 }
+
 \IEEEoverridecommandlockouts %to enable thanks to appear
-\newcommand{\sys}{\textsf{TSC+VIS}\xspace}
 
 \begin{document}
 
 \maketitle
 
 \begin{abstract}
-Segmentation is an important first step in analyzing long running robotic tasks. For reliable results, it is important to consider both visual and kinematic data, as visual data provides important information about the state of the workspace. 
-Existing unsupervised segmentation methodologies are limited in the ways they can leverage visual data and rely on annotations or complete knowledge of all objects in the world. In this paper, we propose a framework that takes a step towards unsupervised segmentation of robotic demonstrations using raw video (i.e., pixel data). 
-We identify key transition events in kinematic data, cluster transitions together using visual data, and then identify segments of the raw video corresponding to these clusters of transition events. 
-The resulting video segments can be used to design error recovery actions, parameter tuning, action classification, 
-and operator skill assessment. 
-\todo{Our results on x suggest y}
+There is a large and growing corpus of kinematic and fixed-camera video recordings of robotic teleoperated trajectories.
+For use in learning from demonstrations, building finite state machines for automation, and operator skill-assessment, a key first step is to segment these trajectories into meaningful contiguous sections in the presence of significant variations in spatial and temporal motion.  
+Manual segmentation is prone to error and impractical for large datasets.  
+In this paper, we present a multi-modal extension to the Transition State Clustering segmentation algorithm, which we proposed in prior work. 
+Visual Transition State Clustering (\tsc) is an algorithm that finds regions of the visual feature space that mark transition events using pre-trained Convolutional Neural Networks (CNNs).
+After a series of pruning and clustering steps, the algorithm adaptively optimizes the number of segments, and this process gives additional robustness in comparison to other Gaussian Mixture Models (GMMs) algorithms.
+CNNs give a task-agnostic featurization of  fixed-camera natural video recordings, i.e. without any dataset-specific feature engineering, for segmentation.
+In a synthetic example, we find that \tsc finds an accurate segmentation under kinematic noise, control noise, and partial observability by using visual features. 
+We evaluate these results on three datasets: surgical suturing, surgical needle passing, and assembly with the PR2.
+Our results suggest that \tsc finds \todo{x\%} tighter clusters in comparison to using kinematics alone.
 \end{abstract} 
+
+\fontsize{10pt}{11.5pt}
+\selectfont
 
 \input{1-intro.tex}
 \input{2-relatedwork.tex}
 \input{3-problemsetup.tex}
 \input{4-clustering.tex}
 \input{5-cnn.tex}
-\input{6-latentstate.tex}
-\input{7-results.tex}
-\input{8-conclusion.tex}
+\input{6-results.tex}
+\input{7-conclusion.tex}
 
 \subsubsection*{Acknowledgement}
-This work is supported in part by a seed grant from the UC Berkeley CITRIS, and by the U.S.\ NSF Award IIS-1227536: Multilateral Manipulation by Human-Robot Collaborative Systems. We thank Intuitive Surgical, Simon DiMao, and the dVRK community for support; NVIDIA for computing equipment grants; Andy Chou and Susan Lim for developmental grants; and Sergey Levine and Katerina Fragkiadaki.
+This work is supported in part by a seed grant from the UC Berkeley CITRIS, and by the U.S.\ NSF Award IIS-1227536: Multilateral Manipulation by Human-Robot Collaborative Systems. We thank Intuitive Surgical, Simon DiMao, and the dVRK community for support; NVIDIA for computing equipment grants; Andy Chou and Susan Lim for developmental grants; and Sergey Levine and Katerina Fragkiadaki, Greg Kahn, Yiming, Those guys from LCD VLAD.
 
 \bibliographystyle{IEEEtranS}
 \bibliography{deepP2P}

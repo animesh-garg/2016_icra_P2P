@@ -1,13 +1,15 @@
 \section{Related Work and Background}
 
 \subsection{Related Work}
-\begin{figure*}[!t]
+
+\iffalse\begin{figure*}[!t]
 \centering
 \includegraphics[width=0.7\linewidth]{figures/system_architecture_2.png}
 \caption{\todo{re-draw} The figure illustrates the steps in our approach to perform seub-task level segmentation of task demonstrations without labels.}
 \label{fig:pipeline}
 \vspace{-10pt}
 \end{figure*}
+\fi
 
 \subsubsection{Learning From Demonstrations}
 Learning from demonstrations uses segmentation to discretize action spaces (skill-learning) which allows for efficient learning of complex tasks~\cite{ijspreet2002learning,pastor2009learning}.
@@ -44,8 +46,8 @@ A number of recent works, attempt to segment human motions from videos \cite{hoa
 Tang et al. and Hoai et al. proposed supervised models for human action segmentation from video.
 Building on the supervised models, there are a few unsuperivsed models for segmentation of human actions: Jones et al.\cite{jones2014unsupervised}, Yang et al. \cite{yang2013discovering}, Di Wu et al. \cite{wu2014leveraging} , and Chenxia Wu et al. \cite{wu2015watch}.
 Jones et al. \cite{jones2014unsupervised} restricts their segmentation to learning from two views of the dataset (i.e., two demonstrations).
-Yang et al. \cite{yang2013discovering} and Wu et al.  \cite{wu2015watch} use k-means to learn a dictionary of primitive motions, however, in prior work, we found that \sys outperforms a standard k-means segmentation approach.
-In fact, the model that we propose is complementary to these works and \sys would be a robust drop-in-replacement for the k-means dictionary learning step.
+Yang et al. \cite{yang2013discovering} and Wu et al.  \cite{wu2015watch} use k-means to learn a dictionary of primitive motions, however, in prior work, we found that transition state clustering outperforms a standard k-means segmentation approach.
+In fact, the model that we propose is complementary to these works and would be a robust drop-in-replacement for the k-means dictionary learning step.
 The approach taken by Di Wu et al. is to parametrize human actions using a skeleton model, and they learn the parameters to this skeleton model using a deep neural network.
 In this work, we explore using generic deep visual features for robotic segmentation without requiring task-specific optimization such as skeleton or action models using in human action recognition.
 
@@ -67,13 +69,7 @@ The linear function switches according to an HMM with states parametrized by a B
 In fact, even the works that apply Gaussian Mixture Models for segmentation \cite{calinon2010learning, lee2015autonomous, kruger2012imitation}, implicitly fit a locally linear dynamical model.
 Moldovan et al. \cite{moldovan2013dirichlet} proves that a Mixture of Gaussians model is equivalent to Bayesian Linear Regression; i.e., when applied to a time window it fits a linear transition between the states.
 
-An important challenge in this field is coping with temporal inconsistencies.
-One approach is to simultaneously learn a probabilistic transition grammar with Finite State Markov Chain model with Gaussian Mixture Emissions (GMM+HMM) \cite{asfour2006imitation,calinon2004stochastic,kruger2010learning, vakanski2012trajectory}.
-These models, also called Baum-Welch models, impose a probabilistic grammar on the segment transitions and can be learned with an EM algorithm.
-However, they can be sensitive to hyper-parameters such as the number of segments and the amount of data \cite{tang2010toward}.
-The problem of robustness in GMM+HMM (or closely related variants) has been addressed using down-weighting transient states \cite{kulic2008scaffolding} and sparsification \cite{grollman2010incremental}.
-
-In prior work, we propose \sys to address the challenge of robust unsupervised segmentation.
+In prior work, we proposed transition state clustering \cite{krishnan2015tsc} to address the challenge of robust unsupervised segmentation.
 Ultimately, the model was a hierarchical application of a Dirichlet Process-Gaussian Mixture model.
 After a series of merging and pruning steps, the resulting segments showed increased robustness to temporal variation and outliers.
 In this work, we extend this model to account for visual features in the robot state.
