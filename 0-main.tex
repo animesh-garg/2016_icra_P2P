@@ -1,8 +1,10 @@
 \documentclass[letterpaper, 10 pt, conference]{ieeeconf}
+ %DRAFT MODE preserves formatting otherwise; %comment out
+% \usepackage[draft]{graphics}
 
-%\let\labelindent\relax
+\let\labelindent\relax
 \input{preamble}
-\usepackage{blindtext}
+
 % Macro for Algorithm Name 
 \newcommand{\TSC}{V-TSC\xspace}
 \newcommand{\tsc}{V-TSC\xspace}
@@ -13,22 +15,20 @@
 \newcommand{\fp}[1]{\ifthenelse{\boolean{include-notes}}%
  {\textcolor{blue}{\textbf{FP: #1}}}{}}
 %===============================================================
-%\title{\LARGE \bf
-%Pixels to Primitives: Learning Sub-Task Level Semantic Segmentation \\
-%of Multi-Step Task Trajectories from Video with %Deep Learning }
-
-% \title{\LARGE \bf
-% Visual Transition State Clustering: \del{Using} Deep Learning with \del{to Featurize} Multi-Modal Trajectories For Unsupervised Sub-Task Level Semantic Segmentation \\
-% {\textcolor{blue}{[v0.2, \today\,\currenttime]}} }
 
 \title{\LARGE \bf
-Visual Transition State Clustering: Multi-Step Task Level Segmentation of Multi-Modal Trajectories from ConvNet\del{Can either Deep Learning} based Video Features\\
-{\textcolor{blue}{[v0.2, \today\,\currenttime]}} }
+Visual Transition State Clustering: Unsupervised Segmentation\\ of
+Multi-Modal \del{Surgical}Task Trajectories with Deep Learning}
+%Pixels to Primitives: Learning Sub-Task Level Semantic Segmentation \\
+%of Multi-Step Task Trajectories from Video with %Deep Learning 
 
+% Visual Transition State Clustering: \del{Using} Deep Learning with \del{to Featurize} Multi-Modal Trajectories For Unsupervised Sub-Task Level Semantic Segmentation \\
+
+% Visual Transition State Clustering: Unsupervised Segmentation of Multi-Modal Trajectories with Deep Learning based Video Features\\
 
 \author{%
 Adithyavairavan Murali*, Animesh Garg*, Sanjay Krishnan*,\\ Florian Pokorny,
-Pieter Abbeel, Trevor Darrell, Ken Goldberg 
+Pieter Abbeel, Trevor Darrell, Ken Goldberg, {\footnotesize \textcolor{blue}{[v0.2, \today\,\currenttime]}} 
 \thanks{\hrule \vspace{5pt} * These authors contributed equally to the paper}%
 \thanks{EECS \& IEOR, University of California, Berkeley CA USA; \texttt{\{adithya\_murali, animesh.garg, sanjaykrishnan, ftpokorny, pabbeel, trevor, goldberg\}@berkeley.edu}}%
 % \thanks{$^{1}$EECS, University of California, Berkeley; {\{sanjaykrishnan, adithya\_murali\}@berkeley.edu}}%
@@ -42,35 +42,33 @@ Pieter Abbeel, Trevor Darrell, Ken Goldberg
 \maketitle
 
 \begin{abstract}
-There is a large and growing collection of kinematic and fixed-camera video data of robotic demonstrations.
-And to enable a number of applications-- such as learning from demonstrations, constructing finite state machines for automation, and operator skill-assessment -- a key first step is to segment these trajectories into meaningful contiguous sections in the presence of significant variations in spatial and temporal dimensions.  
+There is a large and growing collection of kinematic and video recordings of robotic demonstrations.
+To learn from this data, a key first step is to segment these trajectories into meaningful contiguous sections in the presence of significant variation.  
 However, manual segmentation may be prone to error or even impractical for large datasets.
-
-In this paper, we present Visual Transition State Clustering, a framework that extends our prior work to leverage multi-modal data including videos  for sub task-level segmentation without feature engineering. Visual Transition State Clustering (\tsc) is an algorithm that finds regions of the visual feature space that mark transition events using pre-trained Convolutional Neural Networks (CNNs).
+In this paper, we present Visual Transition State Clustering, a framework that leverages videos data for task-level segmentation. Visual Transition State Clustering (\tsc) finds regions of the visual feature space that mark transition events using features constructed from pre-trained Convolutional Neural Networks (CNNs).
 After a series of pruning and clustering steps, the algorithm adaptively optimizes the number of segments, and this process gives additional robustness in comparison to other Gaussian Mixture Models (GMMs) algorithms.
 CNNs give a task-agnostic featurization of  fixed-camera natural video recordings, i.e. without any dataset-specific feature engineering, for segmentation.
 In a synthetic example, we find that \tsc finds an accurate segmentation under kinematic noise, control noise, and partial observability by using visual features. 
 We evaluate these results on three datasets with multi-step tasks: surgical suturing, surgical needle passing, and assembly task with the PR2. We also compare predictions using only videos of human demonstrations for the same assembly task.
-Our results suggest that \tsc finds \todo{x\%} tighter clusters in comparison to using kinematics alone. 
-The code and data is available at:\todo{make webpage} 
-\href{http://berkeleyautomation.github.io/surgical-tools/}{http://berkeleyautomation.github.io/vtsc/}
+%Our results suggest that \tsc finds \todo{x\%} tighter clusters in comparison to using kinematics alone. 
+Supplementary material, data and code is available at: 
+\href{http://berkeleyautomation.github.io/vtsc/}{http://berkeleyautomation.github.io/vtsc/}
 \end{abstract} 
 
 \fontsize{10pt}{11.5pt}
 \selectfont
 
-\input{1-intro.tex}
-\input{2-relatedwork.tex}
-\input{3-problemsetup.tex}
-\input{4-clustering.tex}
-\input{5-cnn.tex}
-\input{6-results.tex}
-\input{7-conclusion.tex}
+\subfile{1-intro.tex}
+\subfile{2-relatedwork.tex}
+\subfile{3-problemsetup.tex}
+\subfile{4-clustering.tex}
+\subfile{5-cnn.tex}
+\subfile{6-results.tex}
+\subfile{7-conclusion.tex}
 
 \subsubsection*{Acknowledgement}
-This work is supported in part by a seed grant from the UC Berkeley CITRIS, and by the U.S.\ NSF Award IIS-1227536: Multilateral Manipulation by Human-Robot Collaborative Systems.  NVIDIA for computing equipment grants; Andy Chou and Susan Lim for developmental grants; Greg Hager for datasets; Sergey Levine and Katerina Fragkiadaki, Greg Kahn, Yiming Jen, Zhongwen Xu for discussions.\\
-The code and data is available at:\todo{make webpage} 
-\href{http://berkeleyautomation.github.io/surgical-tools/}{http://berkeleyautomation.github.io/vtsc/}
+This work is supported in part by a seed grant from the UC Berkeley CITRIS, and by the U.S.\ NSF Award IIS-1227536: Multilateral Manipulation by Human-Robot Collaborative Systems.  NVIDIA for computing equipment grants; Andy Chou and Susan Lim for developmental grants; Greg Hager for datasets; Sergey Levine, Katerina Fragkiadaki, Greg Kahn, Yiming Jen, and Zhongwen Xu for discussions. Supplementary material, data and code is available at: 
+\href{http://berkeleyautomation.github.io/vtsc/}{http://berkeleyautomation.github.io/vtsc/}
 
 \bibliographystyle{IEEEtranS}
 \bibliography{deepP2P}

@@ -1,60 +1,12 @@
+\documentclass[0-main.tex]{subfiles}
+\begin{document}
+
 \subsection{End-to-End Evaluation}
-\todo{We take the best featurization from the previous section and apply it to the following datasets}
-
-% ALL OF JIGSAWS RESULTS
-\begin{figure*}[!ht]
-	\centering
-	\begin{subfigure}[t]{7in}
-	    \centering
-        \includegraphics[width=0.8\linewidth]{figures/suturing}
-		\caption{Suturing}
-		\label{fig:suturing}
-% 		\vspace{-5pt}
-	\end{subfigure}
-	\begin{subfigure}[t]{0.5\textwidth}
-	    \vspace{0pt}
-	    \centering
-		\includegraphics[width=\linewidth]{figures/needle_passing}
-		\caption{Needle Passing}
-		\label{fig:needlePassing}
-		\par\vspace{0pt}
-	\end{subfigure}
-	\quad
-	\begin{subfigure}[t]{0.4\textwidth}
-            \vspace{0pt}
-            \centering
-            \resizebox{\linewidth}{!}{% put in textwidth
-                \begin{tabular}{ll|l|l|l|l|l|l}
-                \multicolumn{2}{c}{}                                     &     \multicolumn{3}{c}{\cellcolor[HTML]{CBCEFB}Silhouette Score} & \multicolumn{3}{c}{\cellcolor[HTML]{FFC72C}DTW Score}\\
-                \multicolumn{2}{c}{}    & \multicolumn{1}{c|}{K} & \multicolumn{1}{c|}{Z} & \multicolumn{1}{c|}{K+Z}& \multicolumn{1}{c|}{K} & \multicolumn{1}{c|}{Z} & \multicolumn{1}{c}{K+Z} \\ \hline \hline 
-                \rowcolor[HTML]{E0E0E0}
-                \cellcolor[HTML]{CBCEFB}                                 & E     & &    &   &   &  &    \\ 
-                \cellcolor[HTML]{CBCEFB}                                 & E+I   & &    &   &   &  &    \\ 
-                \rowcolor[HTML]{E0E0E0}
-                \multirow{-3}{*}{\cellcolor[HTML]{CBCEFB}Suturing}       & E+I+N & &    &   &   &  &    \\ 
-                \cellcolor[HTML]{FFC72C}                                 & E     & &    &   &   &  &    \\ 
-                \rowcolor[HTML]{E0E0E0}
-                \cellcolor[HTML]{FFC72C}                                 & E+I   & &    &   &   &  &    \\ 
-                \multirow{-3}{*}{\cellcolor[HTML]{FFC72C}\parbox{1.2cm}{Needle Passing}} & E+I+N & &    &   &   &  &    \\ \hline
-                \end{tabular}
-            }
-            \caption{TABLE III: Comparison of \TSC performance on Suturing and Needle Passing Tasks. We compare the prediction performance by incrementally adding demonstrations from Experts~(E), Intermediates~(I), and Novices~(N) respectively to the dataset.\todo{Experiments running on machine, also handle whitespece}}
-            \label{tab:jigsaws}
-            \par\vspace{0pt}
-	\end{subfigure}
-	\caption{\todo{fix figure} The figure shows a sequence of images for the Suturing and Needle Passing tasks in JIGSAWS dataset\cite{gao2014jigsaws}.
-The first row shows a manual segmentation of the task in 4 semantic steps: (1) Needle Positioning, (2) Needle Pushing, (3) Pulling Needle, (4) Hand-off.
-Both these tasks require 4 repetitions of the full 4 step cycle and run for approx. 100s (frame numbers are at 30 fps).
-We show the sub-task level segmentation results from our completely unsupervised approach with only Kinematics data, only Visual data and a concatenation of both tasks with multiple spurious segments as in \figref{needlePassing} and \ref{fig:suturing}. \figref{suturing} also shows (in magenta) frames of predicted Needle Hand-off, and (in orange) a new transition for needle re-orientation between needle push and needle pull.
-}
-	\label{fig:jigsaws}
-	\vspace{-15pt}
-\end{figure*}
-
+For all subsequent experiments, we use the best result from the experiments with the visual featurization. We use a pre-trained VGG CNN conv5\_3 and encoded with PCA with 100 dimensions. 
 
 % \subsubsection{Synthetic Example}
 \vspace{5pt}
-\noindent \textbf{1. Synthetic Example: }
+\noindent \textbf{1. Synthetic Example: \label{sec:syn}}\todo{This examaple is too wordy!!!, compress}
 A Synthetic example with a robot in blue and target in yellow is shown in \figref{toyEx}. The robot moves to the target, and a new target appears after the robot has reached the current target. Each demonstration episode consists of 4 targets, where the target $i$ is sampled from  $\sim\,\mathcal{N}(\mu_i, 1)$ where $\mu_i$ is randomly generated in the first episode and maintained constant across subsequent episodes. For these examples, we generate 5 episodes of each individual setting.
 
 \figref{toyEx} (b) shows the results of unsupervised segmentation into the 4 steps -- each time the robot reaches the target-- using only kinematics data ($\binom{x(t)}{y(t)}$). The results for this preliminary example align the transitions with changes in directions robots motions affirming our correctness of model for hierarchical clustering. 
@@ -69,12 +21,12 @@ Next, we introduce a kinematic sensor noise in the system $\hat{x}(t)= x(t)+\nu$
 
 %===============================================================
 %PR2 figures
-\begin{figure*}[ht!]
+\begin{figure*}[t!]
 	\centering
 	\begin{subfigure}[t]{3.4in}
 	    \centering
         \includegraphics[width=0.5\linewidth]{figures/insert}
-		\caption{The figure illustrates the performance of unsupervised segmentation of the 3 Step Lego Assembly Task performed with tele-operated PR2 with two techniques of manual demonstrations.}
+% 		\caption{}
 		\figlabel{lego-pr2}
 		\vspace{-5pt}
 	\end{subfigure}
@@ -82,14 +34,79 @@ Next, we introduce a kinematic sensor noise in the system $\hat{x}(t)= x(t)+\nu$
 	\begin{subfigure}[t]{3.4in}
 	    \centering
 		\includegraphics[width=0.5\linewidth]{figures/insert}
-		\caption{The figure illustrates the comparison of unsupervised segmentation of the Toy Example performed with tele-operated PR2 with two techniques of manual demonstrations.}
+% 		\caption{}
 		\figlabel{toyPlane-pr2human}
 		\vspace{-5pt}
 	\end{subfigure}
-	\caption{\todo{fix figure: Similar figure as for JIGSAWS dataset}}
+	\caption{The figure (a) illustrates the performance of unsupervised segmentation of the 3 Step Lego Assembly Task performed with tele-operated PR2 with two techniques of manual demonstrations. The figure (b) illustrates the comparison of unsupervised segmentation of the Toy Example performed with tele-operated PR2 with two techniques of manual demonstrations.}
 	\figlabel{pr2_expts}
+% 	\vspace{-10pt}
+\end{figure*}
+
+
+% ALL OF JIGSAWS RESULTS
+\begin{figure*}[t!]
+	\centering
+	\begin{subfigure}[t]{4.3in}
+	    \vspace{0pt}
+	    \centering
+        \includegraphics[width=\linewidth]{figures/suturing}
+% 		\caption{Suturing}
+		\label{fig:suturing}
+		\par\vspace{0pt}
+		\vspace{-10pt}
+	\end{subfigure}
+% 	\begin{subfigure}[t]{0.5\textwidth}
+% 	    \vspace{0pt}
+% 	    \centering
+%	    \vspace{0pt}
+% 		\includegraphics[width=\linewidth]{figures/needle_passing}
+% 		\caption{Needle Passing}
+% 		\label{fig:needlePassing}
+%		\par\vspace{0pt}
+% 	\end{subfigure}
+% 	\quad
+	\begin{subfigure}[t]{2.65in}
+        \vspace{0pt}
+        \centering
+        \resizebox{\linewidth}{!}{% put in textwidth
+            \begin{tabular}{ll|l|l|l}
+            \\ \hline 
+            \multicolumn{2}{c|}{}    & \multicolumn{1}{c|}{K} & \multicolumn{1}{c|}{Z} & \multicolumn{1}{c}{K+Z} \\ \hline \hline
+            \multicolumn{5}{l}{\cellcolor[HTML]{CBCEFB}Silhouette Score -- Intrinsic Evaluation} \\
+            \cellcolor[HTML]{CBCEFB}                                 & E     & 0.000 $\pm$ 0.000 &  0.000 $\pm$ 0.000   & 0.000 $\pm$ 0.000  \\ 
+            \rowcolor[HTML]{E0E0E0}
+            \cellcolor[HTML]{CBCEFB}                                 & E+I   & &    &  \\ 
+            \multirow{-3}{*}{\cellcolor[HTML]{CBCEFB}Suturing}       & E+I+N & &    &  \\ 
+            \rowcolor[HTML]{E0E0E0}
+            \cellcolor[HTML]{FFC72C}                                 & E     & &    &  \\ 
+            \cellcolor[HTML]{FFC72C}                                 & E+I   & &    &  \\ 
+            \rowcolor[HTML]{E0E0E0}
+            \multirow{-3}{*}{\cellcolor[HTML]{FFC72C}\parbox{1.2cm}{Needle Passing}} & E+I+N & &    &  \\ \hline \hline
+            \multicolumn{5}{l}{\cellcolor[HTML]{FFC72C}Normalized DTW Score -- Extrinsic evaluation against manual labels} \\ 
+            \cellcolor[HTML]{CBCEFB}                                 & E     & &    &  \\ 
+            \rowcolor[HTML]{E0E0E0}
+            \cellcolor[HTML]{CBCEFB}                                 & E+I   & &    &  \\ 
+            \multirow{-3}{*}{\cellcolor[HTML]{CBCEFB}Suturing}       & E+I+N & &    &  \\ 
+            \rowcolor[HTML]{E0E0E0}
+            \cellcolor[HTML]{FFC72C}                                 & E     & &    &  \\ 
+            \cellcolor[HTML]{FFC72C}                                 & E+I   & &    &  \\ 
+            \rowcolor[HTML]{E0E0E0}
+            \multirow{-3}{*}{\cellcolor[HTML]{FFC72C}\parbox{1.2cm}{Needle Passing}} & E+I+N & &    &  \\ \hline
+            \end{tabular}
+        }
+        \caption*{TABLE III: Comparison of \TSC performance on Suturing and Needle Passing Tasks. We compare the prediction performance by incrementally adding demonstrations from Experts~(E), Intermediates~(I), and Novices~(N) respectively to the dataset.\todo{use white space for caption} \label{tab:jigsaws}}
+        \vspace{-15pt}
+        \par\vspace{0pt}
+	\end{subfigure}
+	\caption{The first row shows a manual segmentation of the task in 4 semantic steps: (1) Needle Positioning, (2) Needle Pushing, (3) Pulling Needle, (4) Hand-off.
+Both these tasks require 4 repetitions of the full 4 step cycle and run for approx. 100s (frame numbers are at 30 fps).
+We show the sub-task level segmentation results from our completely unsupervised approach with only Kinematics data, only Visual data and a concatenation of both tasks with multiple spurious segments as in \figref{needlePassing} and \ref{fig:suturing}. \figref{suturing} also shows (in magenta) frames of predicted Needle Hand-off, and (in orange) a new transition for needle re-orientation between needle push and needle pull.\todo{fix caption since needle passing image is no longer here}
+}
+	\label{fig:jigsaws}
 	\vspace{-15pt}
 \end{figure*}
+
 
 % \begin{figure}[!t]
 % \centering
@@ -108,6 +125,33 @@ Next, we introduce a kinematic sensor noise in the system $\hat{x}(t)= x(t)+\nu$
 % \end{figure}
 
 % \subsubsection{PR2: Legos and Toy Plane Assembly}
+
+\begin{table}[t!]
+\centering
+\caption{Comparison of \TSC performance on Plane and Lego Assembly Tasks. Both tasks show improvements in clustering and prediction accuracy using multi-modal data as compared to either modality. Further, only vision ($Z$) is available for human demos of the plane assembly task. Comparable segmentation results are obtained using only video input for human demos. \textit{Higher} Silhoutte Scores and \textit{lower} DTW scores are better, respectively. \label{tab:pr2}}
+\vspace{-5pt}
+\begin{tabular}{l|l|l|l}
+\hline
+\multicolumn{1}{c|}{}& \multicolumn{1}{c|}{K} & \multicolumn{1}{c|}{Z} & \multicolumn{1}{c}{K+Z} \\ \hline \hline 
+\multicolumn{4}{l}{\cellcolor[HTML]{CBCEFB}Silhouette Score -- Intrinsic Evaluation}  \\
+Lego (Robot)    & 0.306$\pm$0.006 & 0.287$\pm$0.051 & \textbf{0.323}$\pm$0.105  \\
+\rowcolor[HTML]{E0E0E0}
+ Plane (Robot)   & 0.481$\pm$0.022 & 0.298$\pm$0.013    & \textbf{0.542}$\pm$0.134 \\
+Plane (Person 1) & -- & \textbf{0.202}$\pm$0.020  & -- \\ 
+\rowcolor[HTML]{E0E0E0}
+Plane (Person 2) & -- & \textbf{0.255}$\pm$0.030  & -- \\ \hline \hline
+\multicolumn{4}{l}{\cellcolor[HTML]{FFC72C}Normalized DTW Score -- Extrinsic evaluation against manual labels}  \\ 
+Lego (Robot)    & 2.97$\pm$0.17\%  & 3.21$\pm$0.35\%  & \textbf{3.04}$\pm$0.25\%  \\
+\rowcolor[HTML]{E0E0E0}
+ Plane (Robot)   & 4.89$\pm$0.6\%   & 4.60$\pm$0.80\%  & \textbf{4.19}$\pm$0.32\%    \\ 
+Plane (Person 1) & -- & \textbf{3.88}$\pm$0.93\%  & -- \\ 
+\rowcolor[HTML]{E0E0E0}
+Plane (Person 2) & -- & \textbf{3.22}$\pm$0.47\%  & -- \\ \hline
+\end{tabular} 
+\vspace{-15pt}
+\end{table}
+
+
 \vspace{5pt}
 \noindent \textbf{2. PR2: Legos and Toy Plane Assembly: }
 This experiment involves a multi-step assembly task using (1) large \textit{Lego} blocks and (2) toy \textit{Plane} from the YCB dataset~\cite{calli2015corr}. The data is collected through kinesthetic demonstrations of the task on the PR2 in various situations by the user. 
@@ -123,26 +167,7 @@ We extend the experiment of the toy plane assembly to collect 8 demonstrations e
 
 The results for clustering evaluation and comparison with a set of manual labels using dynamic time warping distance are tabulated in \tabref{pr2}.
 
-\begin{table}[t!]
-\centering
-\caption{Comparison of \TSC performance on Plane and Lego Assembly Tasks \todo{Experiments running on machine}}
-\label{tab:pr2}
-\begin{tabular}{l|l|l|l|l|l|l}
-\multicolumn{1}{c}{}                                     &     \multicolumn{3}{c}{\cellcolor[HTML]{CBCEFB}Silhouette Score} & \multicolumn{3}{c}{\cellcolor[HTML]{FFC72C}DTW Score}\\
-\multicolumn{1}{c}{}    & \multicolumn{1}{c|}{K} & \multicolumn{1}{c|}{Z} & \multicolumn{1}{c|}{K+Z}& \multicolumn{1}{c|}{K} & \multicolumn{1}{c|}{Z} & \multicolumn{1}{c}{K+Z} \\ \hline \hline 
-\rowcolor[HTML]{E0E0E0}
- Lego (Robot)    & &    &   &   &  &    \\ 
- Plane (Robot)   & &    &   &   &  &    \\ 
-\rowcolor[HTML]{E0E0E0}
- Plane (Person 1) & &    &   &   &  &    \\ 
- Plane (Person 2)      & &    &   &   &  &    \\  \hline
-\end{tabular}
-\vspace{-10pt}
-\end{table}
-
-
 %===============================================================
-
 % \subsubsection{Surgical Subtask Segmentation}
 \vspace{5pt}
 \noindent \textbf{4. Surgical Subtask Segmentation: }
@@ -150,7 +175,9 @@ We apply our method to the JIGSAWS dataset\cite{gao2014jigsaws} consisting of su
 
 \vspace{0.5em}
 \noindent\textit{Suturing: }We have explored 39 examples of a 4 throw suturing task (\figref{suturing}). Using the right arm, the first step is to penetrate one of the points on right side. The next step is to force the needle through the phantom to the other side. Using the left arm, the robot pulls the needle out of the phantom, and then hands it off to the right arm for the next point. Qualitative results from the suturing task are illustrated in \figref{suturing}.
-\todo{Discuss: Recovery of transitions which have manual labels, and discovery of new transitions.}
+\tsc learns important transition event as well as finds new transitions not accounted for in our annotation.
+For example, we find that a crucial needle repositioning step is discovered where many demonstrators penetrate and push-through the needle in two different motions.
+\tsc applies finds segments that correspond to linear dynamical systems, and thus applies a more consistent criteria than manual annotation based on domain knowledge.
 
 \vspace{0.5em}
 \noindent\textit{Needle Passing: } Next, we applied our framework to 28 demonstrations of the needle passing task.
@@ -193,3 +220,6 @@ The robot passes a needle through a loop using its right arm, then its left arm 
 \item RGB videos vs. RGB-D videos
 \end{enumerate}
 \fi
+
+
+\end{document}

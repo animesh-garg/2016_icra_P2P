@@ -1,8 +1,10 @@
+\documentclass[0-main.tex]{subfiles}
+\begin{document}
 
 \begin{algorithm}[t!]
 \small
 \DontPrintSemicolon
-\caption{\textbf{\TSC:} Visual-Transition State Clustering}
+\caption{\textbf{\TSC:} Visual-Transition State Clustering \label{alg:vtsc}}
 \KwData{Set of demonstrations:$\mathcal{D}$, $\rho$ pruning parameter}
 \KwResult{Set of Predicted Transitions  $\mathcal{T}_i,\enspace \forall \, d_i \in \mathcal{D}$}
 % \Begin{
@@ -45,9 +47,11 @@
     \lForEach{$d_i \in \mathcal{D}$}{$\mathcal{T}_i \gets DPGMM (\mathtt{T}_i, \alpha_4)$}
     \nl\KwRet{$\mathcal{T}_i,\enspace \forall \, d_i \in \mathcal{D}$}
 % }
-\label{alg:vtsc}
+
 % \vspace*{-10pt}
 \end{algorithm}
+
+\setlength{\textfloatsep}{5pt}% Remove \textfloatsep
 
 \section{Visual Transition State Clustering}
 We present the \tsc algorithm in Algorithm~\ref{alg:vtsc}.
@@ -70,7 +74,7 @@ To avoid variance due to extraneous objects and small changes in lighting, we fi
 
 We first cropped all videos by equal amounts to capture only the workspace where most of the robot manipulation happened. 
 Then, they were rescaled to 640 x 480 dimensions with normalization to have a zero mean RGB value as standard \cite{krizhevsky2012imagenet,simonyan2014very}. 
-Finally, for computational reasons, the videos were downsampled to \todo{x} frame per second.  
+Finally, for computational reasons, the videos were downsampled to 10 frame per second.  
 All of pre-processing happened with the open source program \texttt{ffmpeg}.
 
 \subsubsection{Visual Featurization}
@@ -80,20 +84,19 @@ Once the images were pre-processed, we applied the convolutional filters from th
 \noindent\textbf{AlexNet: } Krizhevsky et al. proposed a convolutional neural network architecture for image classification \cite{krizhevsky2012imagenet}. This architecture was seminal as it proposed multiple stacked convolutional filters (5 in all).   
 
 \vspace{0.25em}
-\noindent\textbf{VGG: } Simoyan et al. proposed an alternative architecture termed VGG which increased the number of convolutional layers significantly (16 in all) \cite{simonyan2014very}.
+\noindent\textbf{VGG: } Simoyan et al. proposed an alternative architecture termed VGG (acronym for Visual Geometry Group) which increased the number of convolutional layers significantly (16 in all) \cite{simonyan2014very}.
 
 \vspace{0.25em}
 
-In this work, we explore selecting convolutional features from different layers in the hierarchy. 
-This problem is called transfer learning and has been well studied \todo{cite}.
 It is established that earlier layers in the hierarchy give more general features while later layers give more specific ones.
 In our experiments, we explore the level of generality of features required for segmentation. 
 We also compare these features to other visual featurization techniques such as SIFT and SURF.
 
 \subsubsection{Post-Processing: Encoding}
 After constructing these features, the next step is encoding the results of the convolutional filter into a vector $z(t)$.
-We explore three encoding techniques: (1) raw values, (2) VLAD, and (3) LCD.
+We explore three encoding techniques: (1) Raw values, (2) Vector of Locally Aggregated Descriptors (VLAD)~\cite{arandjelovic2013all}, and (3) Latent Concept Descriptors (LCD)~\cite{xu2014discriminative}.
 
+\iffalse
 \vspace{0.25em}
 \noindent\textbf{Raw Filter Values: } The first encoding technique that we explore is using the raw convolutional filter values. We stack these values into a vector which constructs $z(t)$.
 
@@ -110,6 +113,7 @@ VLAD vector is obtained by concatenating $u_k$ over all the K centers, $V = [u_1
 \vspace{0.25em}
 \noindent\textbf{Latent Concept Descriptors (LCD) \cite{xu2014discriminative}: }
 Convolutional layers contain important spatial information, however at the cost of high dimensional representation. For instance the feature dimension at a convolutional layer can be $c\times c \times M$, where $c$ is filter size and $M$ is number of filters. However using the latent concept descriptors, a layer of size $c\times c \times M$ can be converted into $c^2$ latent concept descriptors with M dimensions. Each latent concept descriptor represents the responses from the M filters for a specific pooling location. 
+\fi
 
 \subsubsection{Post-Processing: Dimensionality Reduction}
 After encoding, we feed the features $z(t)$ through a dimensionality reduction process.
@@ -118,23 +122,28 @@ Furthermore, almost all GMM-based clustering algorithms converge to a local mini
 Principal Component Analysis (PCA) is widely applied in computer vision. 
 We explore alternative dimensionality reduction techniques to find desirable properties of the dimensionality reduction that result in improve segmentation performance.
 In particular, we explore Gaussian Random Projections (GRP), and Canonical Correlation Analysis (CCA).
+CCA would find a projection that maximizes the visual features correlation with the kinematics, and the GRP is a baseline if the dimensionality reduction were random.
 
 \subsection{Other Extensions}
 \subsubsection{Sliding Window States}
 In our prior work, we used the concatenation of kinematic and visual features at a given time $t$ as the state representation $\binom{k(t)}{z(t)}$. However, the use of rolling time window in both kinematics and visual space allows capturing dynamics. 
-We empirically found that the use of $[k(t-1), k(t), k(t+1)]^T$ as the kinematic state representation led to improved segmentation accuracy. Other lengths of temporal history were experimented with as shown in Figure~\todo{add figure}.
+We empirically found a sliding window of size 3, i.e.,  $[k(t-1), k(t), k(t+1)]^T$, as the kinematic state representation led to improved segmentation accuracy. 
 
 \subsubsection{Skill-Weighted Pruning} 
 Different demonstrators often have different skill levels, and we extend our prior work to prune transition states in a weighted manner.
 Let, $w_i$ be the weight for each demonstration $d_i \in \mathcal{D}$, such that $w_i \in [0,1]$ and $\hat{w}_i = \frac{w_i}{\sum w_i}$. Then a cluster $C_{kk'}$ is pruned if it does not contain points from at least $\rho$ fraction of demonstrations. This converts to:
+\vspace{-3pt}
 \[\sum_{d_i} \hat{w}_i\mathbbm{1}\Big( \sum_{n:N(n)\in d_i} \mathbbm{1}( CP(n) \in C_{kk'}) \geq 1 \Big) \leq \rho 
 \]
-
+\vspace{-5pt}
 
 \subsubsection{Robust Temporal Clustering}
 In our prior work, we used a hierarchical application of DP-GMM first clustering spatially and then temporally. In this work, we explore a more robust variant of this approach.
 We iteratively hold out one out of the $N$ demonstrations and apply \tsc to the remaining demonstrations.
-Then, over $N-1$ runs of \tsc, $N-1$ predictions are made for each $d_i \in \mathcal{D}$. We temporally cluster the transitions across $N-1$ predictions, to estimate final transition state centroid and variance. This step is illustrated in step 20-21 of Algorithm~\ref{alg:v.tsc}.
+Then, over $N-1$ runs of \tsc, $N-1$ predictions are made for each $d_i \in \mathcal{D}$. We temporally cluster the transitions across $N-1$ predictions, to estimate final transition state centroid and variance. This step is illustrated in step 20-21 of Algorithm~\ref{alg:vtsc}.
 % the centroids of the transition state clusters.
 
 % \vspace{0.5em}
+
+
+\end{document}

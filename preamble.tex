@@ -2,14 +2,14 @@
 %\overrideIEEEmargins
 
 %floats and figures
-\usepackage{graphics}
+\usepackage{graphics} %imported in the main document.
 \usepackage[pdftex]{graphicx}
 \usepackage[font={small}]{caption}
 \usepackage{subcaption}
 %\usepackage[center]{subfigure} %DONT USE BOTH SUBCAPTION AND SUBFIGURE
 %\DeclareGraphicsExtensions{.pdf,.png,.jpg}
 %\usepackage{overpic}
-%\usepackage[rightcaption]{sidecap}
+\usepackage[rightcaption]{sidecap}
 %\usepackage{pbox}
 
 %Math Stuff
@@ -40,6 +40,8 @@
 \usepackage{fixltx2e} %fix latex issue across versions
 \usepackage{bm}
 \usepackage{units}
+\usepackage{subfiles} %individual file compilation--makes it quick 
+
 
 \usepackage{makeidx}
 % \usepackage{enumitem}

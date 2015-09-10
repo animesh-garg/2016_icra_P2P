@@ -103,3 +103,33 @@ AlexNet LCD VLAD & 0.068$\pm$0.035  & 0.033$\pm$0.001 & -0.063$\pm$0.053 & 0.285
 % % \end{algorithmic}
 % \end{algorithm}
 
+        \resizebox{\linewidth}{!}{% put in textwidth
+            \begin{tabular}{ll|l|l|l|l|l|l}
+            \multicolumn{2}{c}{}                                     &     \multicolumn{3}{c}{\cellcolor[HTML]{CBCEFB}Silhouette Score} & \multicolumn{3}{c}{\cellcolor[HTML]{FFC72C}DTW Score}\\
+            \multicolumn{2}{c}{}    & \multicolumn{1}{c|}{K} & \multicolumn{1}{c|}{Z} & \multicolumn{1}{c|}{K+Z}& \multicolumn{1}{c|}{K} & \multicolumn{1}{c|}{Z} & \multicolumn{1}{c}{K+Z} \\ \hline \hline 
+            \rowcolor[HTML]{E0E0E0}
+            \cellcolor[HTML]{CBCEFB}                                 & E     & &    &   &   &  &    \\ 
+            \cellcolor[HTML]{CBCEFB}                                 & E+I   & &    &   &   &  &    \\ 
+            \rowcolor[HTML]{E0E0E0}
+            \multirow{-3}{*}{\cellcolor[HTML]{CBCEFB}Suturing}       & E+I+N & &    &   &   &  &    \\ 
+            \cellcolor[HTML]{FFC72C}                                 & E     & &    &   &   &  &    \\ 
+            \rowcolor[HTML]{E0E0E0}
+            \cellcolor[HTML]{FFC72C}                                 & E+I   & &    &   &   &  &    \\ 
+            \multirow{-3}{*}{\cellcolor[HTML]{FFC72C}\parbox{1.2cm}{Needle Passing}} & E+I+N & &    &   &   &  &    \\ \hline
+            \end{tabular}
+        }
+        
+        
+        \begin{tabular}{ll|l|l|l}
+        \hline
+        \multicolumn{2}{c}{\cellcolor[HTML]{CBCEFB} Toy Example}  & \multicolumn{1}{c|}{\parbox{1.5cm}{Target Noise}} & \multicolumn{1}{c|}{\parbox{1.5cm}{Control Noise}} & \multicolumn{1}{c}{\parbox{2cm}{Kinematics\\ Sensor Noise}} \\ \hline \hline 
+        \rowcolor[HTML]{E0E0E0}
+        \cellcolor[HTML]{CBCEFB}                                 & K     & &    &   \\ 
+        \cellcolor[HTML]{CBCEFB}                                 & Z   & &    &     \\ 
+        \rowcolor[HTML]{E0E0E0}
+        \multirow{-3}{*}{\cellcolor[HTML]{CBCEFB}\parbox{1.3cm}{Silhouette Score}}       & K+Z & &     &  \\ 
+        \cellcolor[HTML]{FFC72C}                                 & K     & &    &   \\ 
+        \rowcolor[HTML]{E0E0E0}
+        \cellcolor[HTML]{FFC72C}                                 & Z   & &    &     \\ 
+        \multirow{-3}{*}{\cellcolor[HTML]{FFC72C}\parbox{1.3cm}{DTW Score}} & K+Z & &    &    \\ \hline
+        \end{tabular}
