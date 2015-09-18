@@ -2,14 +2,25 @@
 \begin{document}
 
 \section{Conclusion}
-Segmentation of demonstrations of a multistep task is an important first step in number of robot learning applications.
-In this work, we explore unsupervised segmentation with task-agnostic features by applying new results in Deep Learning.
-we \emph{automatically} construct visual features using pre-trained CNNs applied to frames of video recordings; thus constructing a high-dimensional trajectory that augments the kinematic state-space.
-We apply the transition state clustering algorithm to learn clusters of states across all demonstrations that mark dynamical system regime switches.
-\todo{??}
-In a synthetic example, we find that \tsc finds an accurate segmentation under kinematic noise, control noise, and partial observability by using visual features. 
-We evaluate these results on three datasets: surgical suturing, surgical needle passing, and assembly with the PR2.
-Our results suggest that \tsc finds \todo{x\%} tighter clusters in comparison to using kinematics alone.
+In this work, we propose \tsc extending the Transition State Clustering algorithm to include visual feature extraction from pre-trained CNNs.
+In our experiments, we apply \tsc to five datasets: (1) a synthetic 4 segment example, (2) JIGSAWS surgical needle passing, (3) JIGSAWS surgical suturing, (4) toy plane assembly by the PR2, and (5) Lego assembly by the PR2.
+On the synthetic example, we find that \tsc recovers the 4 underlying segments in the presence of partial state observation (one kinematic state hidden), control noise, and sensor noise.
+On real datasets, we find that \tsc matches the manual annotation with up to 0.806 NMI.
+Our results also suggest that including kinematics and vision results in increases of up-to 0.215 NMI over kinematics alone.
+We demonstrated the benefits of an unsupervised approach with examples in which \tsc discovers inconsistencies such as segments not labeled by human annotators, and apply \tsc to learn across demonstrations with widely varying operator skill levels.
+We also validated surgical results in a different domain with demonstrations of assembly tasks with the PR2 and human-only demonstrations.
 
+%We also find that \tsc identifies outlier demonstrations with spurious actions, discovers unlabeled segments due to human annotator error, and can learn across demonstrations with widely varying operator skill levels.
+
+\section{Future Work}
+Our results suggest a number of important directions for future work.
+First, we plan to apply the results from this paper to learn transition conditions for finite state machines for surgical subtask automation.
+%in \tsc, we apply pre-trained CNNs for visual featurization.
+The CNNs applied in this work are optimized for image classification of natural images and not the images seen in surgery.
+In future work, we will explore training CNNs from scratch to identify features directly from both pixels and kinematics, or fine-tuning existing networks. 
+Next, our current visual featurization is applied frame-by-frame.
+This approach misses transient events that span frames.
+We will explore applying convolutional features that capture temporality such as 3D convolutional layers and optical flow \cite{simonyan2014two}.
+We are also interested in exploring using recurrent neural networks and variational autoencoders to perform and end-to-end neural network implementation of \tsc.
 
 \end{document}

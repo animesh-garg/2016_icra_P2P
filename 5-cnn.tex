@@ -2,111 +2,122 @@
 \begin{document}
 
 \section{Experiments}
+\label{sec:expt}
 
 \begin{table}[t!]
+\vspace{5pt}
 \centering
-\caption{We evaluate the visual featurization techniques using one of our experimental datasets. The table shows the silhouette score $[-1,1]$ for each of the techniques and dimensionality reduction schemes. We found that PCA (100 dims) applied to VGG conv5\_3 gave the tightest clusters.}
-\label{tab:visual}
 \resizebox{\linewidth}{!}{% put in textwidth
 \begin{tabular}{l|l|l|l}
 \hline
 \rowcolor[HTML]{CBCEFB} 
                  & \multicolumn{1}{c|}{GRP}          & \multicolumn{1}{c|}{PCA} &  \multicolumn{1}{c}{CCA}           \\ \hline \hline
-SIFT             &          -     & -0.113$\pm$0.016 &        -     \\ %\hline
+SIFT             &          -     & 0.443$\pm$0.008 &        -     \\ %\hline
 \rowcolor[HTML]{E0E0E0} 
-AlexNet conv3     & 0.117$\pm$0.035 & 0.200$\pm$0.024& -0.013$\pm$0.012 \\ %\hline 
-AlexNet conv4     & 0.135$\pm$0.013 & 0.213$\pm$0.007& -0.025$\pm$0.009  \\ %\hline
+AlexNet conv3     & 0.559$\pm$0.018  &  0.600$\pm$0.012  &  0.494$\pm$0.006  \\ %\hline 
+AlexNet conv4     & 0.568$\pm$0.007  &  0.607$\pm$0.004  &  0.488$\pm$0.005  \\ %\hline
 \rowcolor[HTML]{E0E0E0} 
-AlexNet pool5     & 0.129$\pm$0.016 & 0.197$\pm$0.009 & -0.029$\pm$0.023  \\ %\hline
-VGG conv5\_3      & 0.141$\pm$0.010 & \textbf{0.273$\pm$0.018} & -0.012$\pm$0.025 \\ %\hline
+AlexNet pool5     & 0.565$\pm$0.008  &  0.599$\pm$0.005  &  0.486$\pm$0.012  \\ %\hline
+VGG conv5\_3      & 0.571$\pm$0.005  &  \textbf{0.637$\pm$0.009}  &  0.494$\pm$0.013  \\
 \rowcolor[HTML]{E0E0E0} 
-VGG LCD-VLAD       & 0.012$\pm$0.002 & 0.068$\pm$0.023 & 0.046$\pm$0.020  \\ %\hline
-AlexNet LCD-VLAD   & 0.033$\pm$0.001 & -0.063$\pm$0.053 & 0.068$\pm$0.035 \\
+VGG LCD-VLAD       & 0.506$\pm$0.001  &  0.534$\pm$0.011  &  0.523$\pm$0.010  \\ %\hline
+AlexNet LCD-VLAD   & 0.517$\pm$0.001  &  0.469$\pm$0.027  &  0.534$\pm$0.018  \\
 \hline
 \end{tabular}
 }
-\vspace{-15pt}
+\caption{The silhouette score for each of the techniques and dimensionality reduction schemes on a subset of suturing demonstrations (5 expert examples). We found that PCA (100 dims) applied to VGG conv5\_3 maximizes silhouette score  \label{tab:visual}}
+\vspace{-10pt}
 \end{table}
 
 
+\subsection{Evaluation Metrics}\label{sec:metrics}
+It is important to note that \tsc is an unsupervised algorithm that does not use labeling.
+Therefore, we evaluate \tsc both intrinsically (without labels) and extrinsically (against human annotations).
 
-\subsection{Evaluation Metric}
-As this is an unsuperivised algorithm, we present results with both an intrinsic metric and comparison to ground truth labels when available.
-The intrinsic metric we us is \textit{Silhouette Score}, which is defined as,  \vspace{-5pt}
-\[ S(i) = \frac{b(i) - a(i)}{max\{a(i), b(i)\},}
+
+
+\vspace{0.25em}
+\noindent \textbf{Intrinsic metric:} The goal of the intrinsic metric is compare the performance of different featurization techniques, encodings, and dimensionality reduction within \tsc without reference to external labels.
+This score is not meant to be an absolute metric of performance but rather a relative measure.
+The intrinsic metric we use measures the ``tightness" of the transition state clusters. 
+This metric is meaningful since we require that each transition state cluster contains transitions from a fraction of at least $\rho$ of the demonstrations, the tightness of the clusters measures how well \tsc discovers regions of the state space where transitions are grouped together.
+This is measured with the mean \textit{Silhouette Score} (denoted by \textsf{ss}), which is defined as follows for each transition state $i$:  \vspace{-5pt}
+\[ \textsf{ss}(i) = \frac{b(i) - a(i)}{max\{a(i), b(i)\}},\quad \textsf{ss}(i) \in [-1,1]
 \]
-where $a(i)$ is defined the average dissimilarity of point $i$ to a cluster $C_j$ as the average of the distance from $i$ to points in $C_j$, and $b(i)$ is defined as minimum mean dissimilarity of point $i$ to cluster $C_k,\ k\neq j$. 
+if transition state $i$ is in cluster $C_j$, $a(i)$ is defined the average dissimilarity of point $i$ to all points in $C_j$, and $b(i)$ the dissimilarity with the closest cluster measured as the minimum mean dissimilarity of point $i$ to cluster $C_k,\ k\neq j$. We use $L_2$-norm as the dissimilarity metric and rescale \textsf{ss} $\in[0,1]$ for ease of comparison. 
 
-We compare similarity of predicted transitions to manual labels with the \textit{Dynamic Time Warping} distance between time-steps for transitions and manual labels. We normalize it by the temporal length of each example. This metric captures the total error in alignment of predicted transitions to transitions in manual labels. 
-
-\begin{figure}[t!]
+\iffalse
+\begin{figure}[!t]
 \centering
 \includegraphics[width=0.5\linewidth]{figures/pca_conv4.png}
 \caption{The figure visualizes the PCA projection of 64,896 dimensional output from \texttt{conv4} of the Alexnet for a sub-sequence of the suturing task video sub-sampled at 10 fps. The points are colored according to time from blue to red. We note that the visual features follow a smooth trajectory even in the high dimensional visual space. \todo{instead use a graph with knn for \% (y-axis) of time $X_{t-1}$\& $X_{t+1}$ for a given traj. at 10fps, are in k-nn with k$\in[2,30]$, rid of figure}  \label{fig:imgtraj}}
 \vspace{-15pt}
 \end{figure}
+\fi
 
+\begin{figure}[!b]
+\vspace{-10pt}
+\centering
+    \includegraphics[width=0.95\linewidth]{figures/sensitivity}
+    \caption{We evaluate the sensitivity of two hyperparameters set in advance: number of PCA dimensions and sliding window size. The selected value is shown in red double circles.\label{fig:sensitvity}}
+\vspace{-10pt}
+\end{figure}
+
+\vspace{0.25em}
+\noindent \textbf{Extrinsic metric:} To calculate an absolute measure of similarity of \tsc predictions $\mathcal{T}$ with respect to manual annotations $\mathcal{L}$, we use \textit{Normalized Mutual Information} (NMI) which measures the alignment between two label assignments. 
+NMI is equal to the KL-divergence of the joint distribution with the product distribution of the marginals; intuitively, the distance from pairwise statistical independence.
+% This metric captures the total error in alignment of predicted transitions to transitions in manual labels. 
+NMI score lies in $[0,\ 1]$, where $0$ indicates independence while $1$  is perfect matching. It is defined as,
+\[ NMI(\mathcal{T}, \mathcal{L}) = \frac{I(\mathcal{T}, \mathcal{L})}{\sqrt{H(\mathcal{T}) H(\mathcal{L})}}, \quad NMI(\mathcal{T}, \mathcal{L}) \in [0,1]
+\]
+% We compare similarity of predicted transitions to manual labels with the \textit{Dynamic Time Warping} distance between time-steps for transitions and manual labels. We normalize it by the temporal length of each example. This metric captures the total error in alignment of predicted transitions to transitions in manual labels. 
 
 \subsection{Evaluation of Visual Featurization}
-We first describe our experimental evaluation of the visual featurization by varying different visual featurization parameters.
+In our first experiment, we explore different visual featurization, encoding, and dimensionality reduction techniques.
+We applied \tsc to our suturing experimental dataset, and measured the silhouette score of the resulting transition state clusters.
+Table \ref{tab:visual} describes the featurization techniques on the vertical axis and dimensionality reduction techniques on the horizontal axis.
+Our results suggest that on this dataset features extracted from the pre-trained CNNs resulted in tighter transition state clusters compared to SIFT features with a 3\% lower \textsf{ss} than the worst CNN result.
+Next, we found that features extracted with the VGG architecture resulted in the highest \textsf{ss} with a 3\% higher \textsf{ss} than the best AlexNet result.
+We also found that PCA for dimensionality reduction gave the best \textsf{ss} performance 7\% higher than the best GRP result and 10\% higher than best CCA result.
+Because CCA finds projections of high correlation between the kinematics and video, we believe that CCA discard features informative features resulting in reduced clustering performance. 
+We note that neither of the encoding schemes, VLAD or LCD\del{LCD$_{VLAD}$} significantly improve the \textsf{ss}.
 
-\subsubsection{Local Linearity of Visual Features}
-In our first experiment, we explore whether the transitions state clustering model, orginally derived for locally linear dynamical, is still justified for the augmented state $\binom{k(t)}{z(t)}$.
-In Figure \ref{fig:imgtraj}, for a single trajectory from one of our experimental datasets, we plot a 2D PCA visualization of the features from convolutional layer (\texttt{conv4}) of the pre-trained AlexNet architecture. We use a sub-sequence of the full task and sub-sample the data at 10 fps and for each frame, we add a point to the visualization, illustrating the trajectory in feature space. It is worth noting that the visual features follow a smooth trajectory even in the high dimensional visual space, supporting the assumptions of local linearity made by our model for identifying transitions.
-
-
-\subsubsection{Encoding, Dimensionality Reduction, and Architecture}
-There are a number of different design decisions in featurizing the video data using deep learning. 
-We first have to select an architecture, then an encoding, and finally a dimensionality reduction technique.
-In Table \ref{tab:visual}, we evaluate this design space by using \tsc with the different visual featurization techniques.
-We evaluate the results using the Silhouette metric described before on one of our experimental datasets (Suturing which we describe in detail later).
-The results suggest that the VGG architecture gives more tightly clustered segments.
-Interestingly enough, neither one of the encoding schemes significantly improves the clustering.
-Furthermore, amongst the dimensionality reduction techniques, we found that applying PCA gave the tightest clusters.
-
-
-\begin{figure*}[!t]
+\begin{figure}[!t]
 \centering
-\centering
-\begin{subfigure}[t]{4.5in}
-    \vspace{0pt}
-    \centering
-    \includegraphics[width=\linewidth]{figures/toyEx}
+%\begin{subfigure}[t]{4.4in}
+    % \vspace{0pt}
+    % \centering
+    \includegraphics[width=\linewidth]{figures/toyEx-v3.png}
 % 	\caption{Suturing}
-	\label{fig:toyE}
-	\par\vspace{0pt}
-	\vspace{-15pt}
-\end{subfigure}
-\begin{subfigure}[t]{2.6in}
-    \vspace{0pt}
-    \centering
-    \resizebox{\linewidth}{!}{% put in textwidth
-        \begin{tabular}{l|l|l|l}
-        \hline
-        \multicolumn{1}{c|}{}& \multicolumn{1}{c|}{K} & \multicolumn{1}{c|}{Z} & \multicolumn{1}{c}{K+Z} \\ \hline \hline 
-        \multicolumn{4}{l}{\cellcolor[HTML]{CBCEFB}Silhouette Score -- Intrinsic Evaluation}  \\
-        Target Noise    & 0.000 $\pm$ 0.000& 0.000 $\pm$ 0.000 & 0.000 $\pm$ 0.000  \\
-        \rowcolor[HTML]{E0E0E0}
-         Control Noise   & &&\\
-        \parbox{2cm}{Kinematics\\ Sensor Noise} & && \\ \hline \hline
-        \multicolumn{4}{l}{\cellcolor[HTML]{FFC72C}Normalized DTW Score -- Extrinsic evaluation against manual labels}  \\ 
-        Target Noise    & && \\
-        \rowcolor[HTML]{E0E0E0}
-         Control Noise   & &&    \\ 
-        \parbox{2cm}{Kinematics\\ Sensor Noise} & &&\\ \hline
-        \end{tabular}         
-        
-    }
-    \caption{TABLE II: Comparison of \TSC performance on the synthetic example with varying conditions. First we use varying targets, then add control noise to the system. Finally we also evaluate performance in case of corruptions in kinematic sensing only.\todo{flesh out}}
-    \label{tab:toyEx}
-    \par\vspace{0pt}
-\end{subfigure}
-\caption{The figure shows a simulated example with a robot in blue and target in yellow. The robot moves to the target and a new target appears. In each episode, we have 4 targets in these experiments and each algorithm run uses 5 episodes. The first row shows the manual segmentation -- reaching each target. Subsequent rows illustrate learn segmentation without supervision under various combinations of input data.  
-Each row is a sequence of transitions represented by blocks. The width of every block represents the confidence interval conveying the length of transition, with some transitions being sharp while others are longer.\todo{flesh out}}
+% 	\par\vspace{0pt}
+% 	\vspace{-15pt}
+%\end{subfigure}
+\caption{(A) The figure shows a 2D synthetic example with a moving point in blue and target in yellow. The robot moves to the target in a straight line in discrete steps, and a new target appears. 
+(B) Segmentation results for repeated demonstrations with variance in target position.
+(C) Segmentation under control noise, sensor noise, and partial observeration.}
 \label{fig:toyEx}
-\vspace{-15pt}
-\end{figure*}
+\vspace{-10pt}
+\end{figure}
 
 
+There are two hyper-parameters for \tsc which we set empirically: sliding window size (T = 3), and the number of PCA dimensions (k = 100).
+In Figure \ref{fig:sensitvity}, we show a sensitivity plot with the \textsf{ss} as a function of the parameter.
+We calculated the \textsf{ss} using the same subset of the suturing dataset as above and with the VGG conv5\_3 CNN.
+We found that T = 3 gave the best performance.
+We also found that PCA with k = 1000 dimensions was only marginally better than k = 100 yet required $>$30 mins to run.
+For computational reasons, we selected k = 100.
+
+
+
+
+\iffalse
+\subsubsection{Local Linearity of Visual Features}
+In our first experiment, we explore whether the transitions state clustering model, originally derived for locally linear dynamical, is still justified for the augmented state $\mathbf{x}_(t) =\binom{k(t)}{z(t)}$.
+In Figure \ref{fig:imgtraj}, for a single trajectory from one of our experimental datasets, we plot the percent if time, the points ($\mathbf{x}_(t-), \mathbf{x}_(t+1)$) lie within $k$-neighborhood of $\mathbf{x}_(t)$. We use the features from convolutional layer (\texttt{conv4}) of the pre-trained AlexNet. Higher values on y-axis for small $k$ represent that temporally consecutive points lie in vicinity in state space, even in the high dimensional visual space, supporting the assumptions of local linearity made by our model for identifying transitions.
+\fi
+
+% In Figure \ref{fig:imgtraj}, for a single trajectory from one of our experimental datasets, we plot a 2D PCA visualization of the features from convolutional layer (\texttt{conv4}) of the pre-trained AlexNet architecture. We use a sub-sequence of the full task and sub-sample the data at 10 fps and for each frame, we add a point to the visualization, illustrating the trajectory in feature space. It is worth noting that the visual features follow a smooth trajectory even in the high dimensional visual space, supporting the assumptions of local linearity made by our model for identifying transitions.
+
+%\subsubsection{Encoding, Dimensionality Reduction, and Architecture}
 
 \end{document}

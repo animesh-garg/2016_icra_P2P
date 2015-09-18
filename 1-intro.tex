@@ -3,33 +3,40 @@
 
 
 \section{Introduction}
-Segmentation is an important first step in robot learning from complex demonstrations, and it has been applied to skill-learning \cite{calinon2010learning, kruger2010learning, konidaris2011robot}, learning from demonstrations \cite{Niekum2015learning}, reward function parametrization \cite{hanlearning}, and automation of surgical subtasks \cite{murali2015learning}.
-Manual annotation is one approach; however, this can be time-consuming and error-prone if inconsistent.
-There are a number of recent proposals to algorithmically extract segments from unlabeled data.
+Kinematic and fixed-camera video demonstrations from robot-assisted minimally invasive procedures can be used for surgical skill assessment~\cite{gao2014jigsaws}, development of finite state machines~\cite{kehoe2014autonomous,murali2015learning}, learning from demonstration (LfD)~\cite{reiley2010motion}, and calibration~\cite{mahler2014learning}.
+Surgical tasks are often multi-step procedures that have complex interactions with the environment, and as a result, demonstrations are noisy and may contain superfluous or repeated actions \cite{krishnan2015tsc}.
+Temporal segmentation of the demonstrations into meaningful contiguous sections facilitates local learning from demonstrations and salvaging good local segments from inconsistent demonstrations.
+
+Manual annotation provides one approach to segmentation (e.g., \cite{hanlearning}); however, as datasets grow, this can become impractical.
+Human annotators can also be prone to error by missing segments or applying segmentation criteria inconsistently across a dataset.
+There are a number of recent proposals to algorithmically extract segments \cite{calinon2010learning, Niekum2015learning, krishnan2015tsc}.
 Such algorithms fall into two broad categories: (1) dictionary-based, (2) and unsupervised.
-Dictionary-based algorithms construct a pre-defined vocabulary of primitives \emph{a priori} and decompose new trajectories in terms of the primitives.
-However, the key challenge in using a dictionary-based approach is building the dictionary of primitives. 
-Narrowly specified primitives may not cover all of the actions seen in a set of demonstrations, while broad primitives may miss task-specific structure.
+Dictionary-based algorithms require a pre-defined vocabulary of primitives and decompose new trajectories in terms of the primitives.
+However, specific primitives may not cover all of the actions seen in a set of demonstrations, while broad primitives may overlook important transitions.
 
 \begin{figure}[t!]
 \centering
 \vspace{-5pt}
-\includegraphics[width=\linewidth]{figures/pr2_plane_assembly.png}
-\caption{The figure displays a sequence of images from partial assembly of a Toy Plane (YCB Dataset). The first row shows a manual segmentation of the task in 4 semantic steps: Grasp Fuselage, Transfer Fuselage, Grasp Wing, Transfer Fuselage. Rows 2-4 exhibit the sub-task level segmentation learned by our \del{completely} unsupervised approach using 8 demonstrations. Each row is a sequence of transitions represented by blocks. The width of each block represents the confidence interval conveying the length of transition, with some transitions being near instantaneous while others are gradual.\todo{label figure}}
-\figlabel{pr2_toyplane}
+% \includegraphics[width=0.5\linewidth]{figures/insert}
+\includegraphics[width=\linewidth]{figures/suturing-teaser-v4.png}
+\caption{We apply \tsc to a suturing task. Each ``throw" of suturing repeats between four steps, and figure illustrates that \tsc extracts a segmentation that closely aligns with the manual annotation without supervision.}
+\figlabel{surgical-teaser}
 % \label{fig:pr2_toyplane}
 \vspace{-15pt} 
 \end{figure}
 
 
+% \iffalse
 \begin{SCfigure*}[][t!]
     \centering
     \vspace{-10pt}
-    \includegraphics[width=1.5\linewidth]{figures/sysArch}
-    \caption{\tsc is a task segmentation pipeline that starts with multimodal demonstrations (kinematics and vision), uses deep learning to featurize the frames of the video, and then clusters transition events to find segments.}
+    \includegraphics[width=1.55\linewidth]{figures/sysArch}
+    \caption{We use a visual processing pipeline with deep features to construct a trajectory of high-dimensional visual states $z(t)$.
+    We concatenate encoded versions of these features with kinematics and apply hierarchical clustering to find segments.}%dont add more lines--seems to mess up formatting
     \label{fig:pipeline}
     \vspace{-10pt}
 \end{SCfigure*}
+% \fi
 
 % \begin{figure*}[!t]
 % \centering
@@ -39,32 +46,45 @@ Narrowly specified primitives may not cover all of the actions seen in a set of 
 % \vspace{-15pt}
 % \end{figure*}
 
-Unsupervised techniques can avoid dependence on a pre-defined set of primitives, and typically assume some generative mixture model for the data, e.g., locally Gaussian segments, and fit trajectories to this model grouping together locally similar points \cite{calinon2010learning, krishnan2015tsc, calinon2004stochastic, kruger2010learning, fox2009nonparametric, oh2005learning}.
-While unsuperivsed segmentation has been widely studied in the context of kinematic data, increasingly, fixed camera video recordings accompany kinematic recordings of human tele-operation in a variety of datasets \cite{hodgins2009guide, gao2014jigsaws, ofli2013berkeley}.
-Visual features can provide crucial information in a number of scenarios: (1) a robot can only partially observe its state with kinematic data, (2) state-dependent sensor noise in a robots kinematic data, and (3) manipulations of objects in the environment.
-When they do use visual features, existing unsupervised approaches rely on highly constrained/feature-engineered visual sensing models: hand tuned features \cite{krishnan2015tsc}, poses for all objects in the workspace via AR markers \cite{Niekum2015learning}, or motion capture markers in human gesture extraction \cite{kulic2011incremental}.
+Unsupervised techniques avoid dependence on a pre-defined set of primitives using generative mixture models for the data, e.g., locally Gaussian segments, and fit trajectories to these models by clustering together locally similar points \cite{calinon2010learning, krishnan2015tsc, kruger2010learning} \del{fox2009nonparametric}.
+A clustering model allows us to detect outliers and inconsistencies (segmentation points that lie in small clusters) without annotations susceptible to human error.
+It can also give us a natural notion of confidence, through the goodness-of-fit, which can guide the acquisition of demonstrations of segments that require more data. 
+While unsupervised segmentation has been widely studied in the context of kinematic data, increasingly, fixed-camera video is also available.
+
+Visual features can provide information about the state of manipulated objects~\cite{krishnan2015tsc, Niekum2015learning}, and trajectory information when there is state-dependent sensor noise in kinematic data \cite{mahler2014learning}.
+Existing work uses hand-tuned features~\cite{krishnan2015tsc}, poses for all objects in the workspace via AR markers~\cite{Niekum2015learning}, or motion capture markers~\cite{kulic2011incremental}.
+We explore relaxing these constraints by applying recent results in Deep Learning to learn a visual representation that generalizes across tasks.
+
+In this paper, we significantly extend our prior segmentation work, Transition State Clustering~\cite{krishnan2015tsc}, with automatically constructed visual features using \textit{deep} convolutional neural networks (CNNs).
+Computer vision frameworks such as CAFFE~\cite{jia2014caffe} can leverage recent advances in CNNs~\cite{krizhevsky2012imagenet, jia2014caffe, long2014fully} through pre-trained models (on large corpora of natural images). 
+CNNs learn expressive but general feature representations that transfer across domains allowing us to take advantage of the models without having to acquire a large number of examples. 
+Transition State Clustering segments demonstrations by learning switched linear dynamical systems and using clustering to identify regions of the state-space associated with switching events.
+TSC applies a Dirichlet Process Gaussian mixture hierarchically first clustering transition states spatially and then temporally.
+Our prior results suggested that augmenting the state-space with hand-tuned visual features could significantly improve accuracy.
+In the present paper, we extract visual features using filters derived from layers of pre-trained CNNs applied to frames of video recordings and call this new algorithm Transition State Clustering with Deep Learning (\tsc).
+This constructs a high-dimensional trajectory that augments the kinematic state-space (Figure \ref{fig:pipeline}).
+
+% In computer vision, the growing maturity of \emph{deep} featurization e.g., Convolutional Neural Networks (CNNs), has led to a number of seminal results in visual feature extraction \cite{krizhevsky2012imagenet, jia2014caffe, long2014fully}.\del{lecun1995convolutional} Furthermore, frameworks like CAFFE \cite{jia2014caffe} allow for sharing pre-trained models (on large corpora of natural images), and this allows us to take advantage of these results even with relatively small datasets.
+
+We study CNN features for unsupervised temporal trajectory segmentation on five datasets: (1) a synthetic 4 segment example, (2) JIGSAWS surgical needle passing, (3) JIGSAWS surgical suturing, (4) toy plane assembly by the PR2, and (5) Lego assembly by the PR2.
+On the synthetic example, we find that \tsc recovers the 4 underlying segments in the presence of partial state observation (one kinematic state hidden), control noise, and sensor noise. 
+\tsc is an unsupervised algorithm that consistently applies segmentation criteria derived from linear dynamical regimes.
+We compare this criteria with manual annotations when available.
+On real datasets, we find that \tsc matches the manual annotation with up to 0.806 normalized mutual information.
+Our results also suggest that including kinematics and vision results in increases of up-to 0.215 NMI over kinematics alone.
+We demonstrate the benefits of using an unsupervised approach by presenting examples where \tsc discovers unlabeled segments due to human annotator error (as shown in Figure \ref{fig:suturing}), and can learn across demonstrations with widely varying operator skill levels (as shown in Table \ref{tab:jigsaws}).
 
 
-In this work, we explore how we can relax these constraints by applying new results in Deep Learning.
-In computer vision, the growing maturity of \emph{deep} featurization e.g., Convolutional Neural Networks (CNNs), has led to a number of seminal results in visual feature extraction \cite{krizhevsky2012imagenet, lecun1995convolutional, jia2014caffe, long2014fully}.
-Furthermore, frameworks like CAFFE \cite{jia2014caffe} allow for sharing pre-trained models (on terabyte-scale corpora of natural images), and this allows us to take advantage of these results even with relatively small datasets.
+%Clustering allows focussed LFD on each segment resulting in a better fit. 
+%Clustering can identify inconsistent outliers and dirty data segments that cann corrupt LFD, also 
+%Can identify segments where more consistent data is needed.
+%can salvage good segments form bad demo sequences. 
 
-We build on the Transition State Clustering algorithm \cite{krishnan2015tsc} and augment this model with task-agnostic visual features using Deep CNNs.
-In our prior work, we proposed Transition State Clustering to segment demonstrations by learning switched linear dynamical systems and using clustering to identify regions of the state-space associated with switching events.
-This algorithm applied a Dirichlet Process Gaussian mixture hierarchically first clustering transition states spatially and then temporally.
-Our prior results suggested that augmenting the state-space with hand-tuned visual features could significantly improve accuracy of the learned ``transition state clusters".
-In this work, we \emph{automatically} construct visual features using pre-trained CNNs applied to frames of video recordings; thus constructing a high-dimensional trajectory that augments the kinematic state-space.
-
-\noindent We summarize the key experimental results:
-
-\noindent\textbf{Featurization: } We evaluated 7 different visual featurization techniques, and our experimental results suggest high sensitivity to the choice of featurization with a 44\% variation in cluster tightness over the design space. Our results suggest that the conv5\_3 layer of the VGG architecture gives the tightest clustering performance \cite{simonyan2014very}.
-
-\vspace{0.25em}
-\noindent\textbf{Manual Annotation: } We use a dynamic time warping-based metric to evaluate our approach against manual annotation by domain experts and find at most a 5\% error in segmentation precision.
-
-\vspace{0.25em}
-\noindent\textbf{Visual Features Only: } We apply \tsc to a scenario where kinematics data is unavailable a human demonstration of a task without a robot. We find that the segmentation of this visual data aligns to segmentation of kinesthetic demonstrations of the same task with the PR2 with \todo{x\%} accuracy.  
-
+%emph unsupervised
+%avoids human bias
+%apply consistent models -- can discover subtle transitions
+%faster than humans 
+  
 \iffalse
 \begin{figure}[ht]
 \centering

@@ -6,8 +6,8 @@
 \input{preamble}
 
 % Macro for Algorithm Name 
-\newcommand{\TSC}{V-TSC\xspace}
-\newcommand{\tsc}{V-TSC\xspace}
+\newcommand{\TSC}{TSC-DL\xspace}
+\newcommand{\tsc}{TSC-DL\xspace}
 \newcommand{\sys}{\textsf{TSC+VIS}\xspace}
 
 \newboolean{include-notes}
@@ -17,8 +17,8 @@
 %===============================================================
 
 \title{\LARGE \bf
-Visual Transition State Clustering: Unsupervised Segmentation\\ of
-Multi-Modal \del{Surgical}Task Trajectories with Deep Learning}
+TSC-DL: Unsupervised Trajectory Segmentation of \\
+Multi-Modal Surgical Demonstrations with Deep Learning}
 %Pixels to Primitives: Learning Sub-Task Level Semantic Segmentation \\
 %of Multi-Step Task Trajectories from Video with %Deep Learning 
 
@@ -27,8 +27,8 @@ Multi-Modal \del{Surgical}Task Trajectories with Deep Learning}
 % Visual Transition State Clustering: Unsupervised Segmentation of Multi-Modal Trajectories with Deep Learning based Video Features\\
 
 \author{%
-Adithyavairavan Murali*, Animesh Garg*, Sanjay Krishnan*,\\ Florian Pokorny,
-Pieter Abbeel, Trevor Darrell, Ken Goldberg, {\footnotesize \textcolor{blue}{[v0.2, \today\,\currenttime]}} 
+Adithyavairavan Murali*, Animesh Garg*, Sanjay Krishnan*,\\ Florian T. Pokorny,
+Pieter Abbeel, Trevor Darrell, Ken Goldberg%, %{\footnotesize \textcolor{blue}{[v0.5, \today\,\currenttime]}} 
 \thanks{\hrule \vspace{5pt} * These authors contributed equally to the paper}%
 \thanks{EECS \& IEOR, University of California, Berkeley CA USA; \texttt{\{adithya\_murali, animesh.garg, sanjaykrishnan, ftpokorny, pabbeel, trevor, goldberg\}@berkeley.edu}}%
 % \thanks{$^{1}$EECS, University of California, Berkeley; {\{sanjaykrishnan, adithya\_murali\}@berkeley.edu}}%
@@ -42,21 +42,22 @@ Pieter Abbeel, Trevor Darrell, Ken Goldberg, {\footnotesize \textcolor{blue}{[v0
 \maketitle
 
 \begin{abstract}
-There is a large and growing collection of kinematic and video recordings of robotic demonstrations.
-To learn from this data, a key first step is to segment these trajectories into meaningful contiguous sections in the presence of significant variation.  
-However, manual segmentation may be prone to error or even impractical for large datasets.
-In this paper, we present Visual Transition State Clustering, a framework that leverages videos data for task-level segmentation. Visual Transition State Clustering (\tsc) finds regions of the visual feature space that mark transition events using features constructed from pre-trained Convolutional Neural Networks (CNNs).
-After a series of pruning and clustering steps, the algorithm adaptively optimizes the number of segments, and this process gives additional robustness in comparison to other Gaussian Mixture Models (GMMs) algorithms.
-CNNs give a task-agnostic featurization of  fixed-camera natural video recordings, i.e. without any dataset-specific feature engineering, for segmentation.
-In a synthetic example, we find that \tsc finds an accurate segmentation under kinematic noise, control noise, and partial observability by using visual features. 
-We evaluate these results on three datasets with multi-step tasks: surgical suturing, surgical needle passing, and assembly task with the PR2. We also compare predictions using only videos of human demonstrations for the same assembly task.
+The growth of robot-assisted minimally invasive surgery has led to sizeable datasets of fixed-camera video and kinematic recordings of surgical subtasks.
+Temporal segmentation of these trajectories into meaningful contiguous sections is an important first step to facilitate human training and the automation of subtasks.  
+Manual, or supervised, segmentation can be prone to error and impractical for large datasets. 
+We present Transition State Clustering with Deep Learning (\tsc), a new unsupervised algorithm that leverages video and kinematic data for task-level segmentation, and finds regions of the visual feature space that mark transition events using features constructed from layers of pre-trained image classification Convolutional Neural Networks (CNNs).
+We report results on five datasets comparing architectures (AlexNet and VGG), choice of convolutional layer, dimensionality reduction techniques, visual encoding, and the use of Scale Invariant Feature Transforms (SIFT).
+\tsc matches manual annotations with up-to 0.806 Normalized Mutual Information (NMI).
+We also found that using both kinematics and visual data results in increases of up-to 0.215 NMI compared to using kinematics alone.
+We also present cases where \tsc discovers human annotator errors.
 %Our results suggest that \tsc finds \todo{x\%} tighter clusters in comparison to using kinematics alone. 
 Supplementary material, data and code is available at: 
-\href{http://berkeleyautomation.github.io/vtsc/}{http://berkeleyautomation.github.io/vtsc/}
+\href{http://berkeleyautomation.github.io/tsc-dl/}{http://berkeleyautomation.github.io/tsc-dl/}
+% \href{http://j.mp/v-tsc}{j.mp/v-tsc}
 \end{abstract} 
 
-\fontsize{10pt}{11.5pt}
-\selectfont
+%\fontsize{10pt}{11.5pt}
+%\selectfont
 
 \subfile{1-intro.tex}
 \subfile{2-relatedwork.tex}
@@ -66,9 +67,17 @@ Supplementary material, data and code is available at:
 \subfile{6-results.tex}
 \subfile{7-conclusion.tex}
 
-\subsubsection*{Acknowledgement}
-This work is supported in part by a seed grant from the UC Berkeley CITRIS, and by the U.S.\ NSF Award IIS-1227536: Multilateral Manipulation by Human-Robot Collaborative Systems.  NVIDIA for computing equipment grants; Andy Chou and Susan Lim for developmental grants; Greg Hager for datasets; Sergey Levine, Katerina Fragkiadaki, Greg Kahn, Yiming Jen, and Zhongwen Xu for discussions. Supplementary material, data and code is available at: 
-\href{http://berkeleyautomation.github.io/vtsc/}{http://berkeleyautomation.github.io/vtsc/}
+\vspace{2pt}
+
+{\footnotesize 
+\noindent \textbf{Acknowledgement:}
+This work is supported in part by a seed grant from the UC Berkeley CITRIS, and by the U.S.\ NSF Award IIS-1227536: Multilateral Manipulation by Human-Robot Collaborative Systems.  NVIDIA for computing equipment grants; Andy Chou and Susan Lim for developmental grants; Greg Hager for datasets; Sergey Levine, Katerina Fragkiadaki, Greg Kahn, Yiming Jen, and Zhongwen Xu for discussions; Jeff Mahler and Michael Laskey for draft reviews.
+Supplementary material is available at:
+\href{http://berkeleyautomation.github.io/tsc-dl/}{http://berkeleyautomation.github.io/tsc-dl/}
+%\href{http://j.mp/v-tsc}{j.mp/v-tsc}
+}
+
+% \normalsize \selectfont
 
 \bibliographystyle{IEEEtranS}
 \bibliography{deepP2P}
