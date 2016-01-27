@@ -1,29 +1,57 @@
 \documentclass[0-main.tex]{subfiles}
 \begin{document}
 
-\section{Transition State Clustering With Deep Learning}
+\section{Transition State Clustering \\ With Deep Learning}
 \label{sec:vtsc}
-We extend our prior work with states defined with visual features, and present the \tsc algorithm in Algorithm~\ref{alg:vtsc}.
 
-\subsection{Visual Features}
+As defined in Sec~\ref{sec:model}, a transition state is the last state before a dynamical regime transition. Such switching events can be modelled as a latent function of the current state $S:\mathcal{X}\mapsto \{0,1\}$, and we have noisy observations of switching events $\hat{S}(\mathbf{x}(t)) = S(\mathbf{x}(t)+Q(t))$, where $Q(t)$ is i.i.d measurement noise.
+
+\noindent \textbf{Identifying Transitions: }
+Suppose there was only one regime, then following from the Gaussian assumption, this would be a linear regression problem:
+\[
+\arg\min_A \|A X_t - X_{t+1}\|
+\]
+where $X_t$ is a matrix where each column vector is $\mathbf{x}(t)$.
+If there are multiple regimes, Moldovan et al.~\cite{moldovan2013dirichlet} proves that fitting a Jointly Gaussian model to $n(t) = \binom{\mathbf{x}(t+1)}{\mathbf{x}(t)}$ is equivalent to Bayesian Linear Regression--and thus fitting a GMM finds locally linear regimes.
+This GMM model gives us the switching events.
+The observed switching events induce a common probability density $f$ over the state space $\mathcal{X}$ across all demonstrations. The density $f$ can be learned through a Gaussian Mixture Model parameter inference.
+
+\subsection{Task Representation as a Sequence of Transition Clusters}
+The task of learning an ordered set of transition state clusters $\mathcal{C}$ can be addressed by fitting a Non-parametric Gaussian Mixture Model to the set of demonstrations. 
+
+\vspace{2pt}
+\noindent \textbf{Multi-modal State Representation}: A Gaussian mixture model in a Euclidean space $\mathbb{R}^d$ assumes an $L_2$ metric. However in state representations composed of multiple sensing modalities such as kinematics and visual state, the $L_2$ metric may not be used naively. The problem is further exacerbated if the dimensions of different modalities are not comparable.
+
+We address this problem by constructing a hierarchy of GMM clusters, starting with a subset of state representation, only one sensing modality say visual features. 
+Then, we partition the dataset by each transitions most likely mixture.  
+Within each partition, we fit GMM corresponding to a subsequent modality, say kinematics, and repeating this process for different modalities.
+
+% \subsection{Visual Features}
+\vspace{2pt}
+\noindent\textbf{Visual Features}:
+The Transition State Clustering with Deep Learning (\TSC) utilizes 
+domain independent visual features from pre-trained CNNs. 
+CNNs are increasingly popular for image classification and with existing models trained on millions of natural images.
+Intuitively, CNNs classify based on aggregations (pools) of hierarchical convolutions of the pixels. Yosinski et al. noted that CNNs trained on natural images exhibit roughly the same Gabor filters and color blobs on the first layer~\cite{yosinski2014NIPS}. They established that earlier layers in the hierarchy give more general features while later layers give more specific ones. Hence, removing the aggregations and the classification layers results in convolutional filters which can be used to derive generic features across datasets.
+
+We use layers from a pre-trained Convolutional Neural Network (CNNs) to derive the features frame-by-frame. In particular, we explore two architectures designed for image classification task on natural images: (a) \textbf{AlexNet: } Krizhevsky et al. proposed multilayer (5 in all) a CNN architecture \cite{krizhevsky2012imagenet}, and (b)~\textbf{VGG: } Simoyan et al. proposed an alternative architecture termed VGG (acronym for Visual Geometry Group) which increased the number of convolutional layers significantly (16 in all)~\cite{simonyan2014very}. In our experiments, we explore the level of generality of features required for segmentation. We also compare these features to other visual featurization techniques such as SIFT for the purpose of task segmentation using \TSC.
+
+
+\vspace{2pt}
+\noindent\textbf{Algorithm Overview}: \\
 We define an augmented state space $\mathbf{x}(t) = \binom{k(t)}{z(t)}$, where $k(t) \in \mathbb{R}^k$ are the kinematic features and $z(t) \in \mathbb{R}^v$ are the visual features.
-We use layers from a pre-trained Convolutional Neural Network (CNNs) to derive the features frame-by-frame.
-CNNs are increasingly popular for image classification and as a result a number of image classification CNNs exist that are trained on millions of natural images.
-Intuitively, CNNs calssify based on aggregations (pools) of hierarchical convolutions of the pixels. Removing the aggregations and the classifiers, results in convolutional filters which can be used to derive generic features.
+The augmented state for each demonstration $d_i \in \mathcal{D}$ is collected in a state vector $N$. GMM clustering over the sequence of states in $N$, results in the identification of the change points, or the switching events where $A(t) \ne A(t+1)$.
 
-We found that use of these features requires a number of pre-processing and post-processing steps; in addition to a number of design choices within the CNN such as which convolutional layer(s) to use for composing the visual featurization.
+The change points from all demonstrations in  $\mathcal{D}$ are collected into a set $\mathcal{C}^{CP}$. Further hierarchical clustering uses state representations only at change points. 
+Intuitively, the change point identification results in an over segmentation of the trajectory in state space, while subsequent clustering steps retain only a small subset of transition states (change points) that are consistent across the data set. 
 
-\subsubsection{Pre-processing}
-CNNs are trained on static images for image classification, and as a result their features are optimized for identifying salient edges and colors. However, they do not capture temporal features and do differentiate the between robot and workspace features.
-Furthermore, since we aggregate across demonstrations, we need to ensure that these features are largely consistent. 
-To reduce variance due to extraneous objects and lighting changes, we crop each video to capture the only the relevant workspace where robot manipulation occurs.
-Then, the videos are rescaled to $640$x$480$ along with down-sampling to $10$ frames per second for computational efficiency. 
- All frames in the videos are normalied to a \textit{zero} mean in all channels (RGB) individually~\cite{krizhevsky2012imagenet,simonyan2014very}. All of pre-processing were preformed with open source \texttt{ffmpeg} library.
-% To reduce variance due to extraneous objects and lighting changes, we first pre-processed the videos.
-% We first cropped all videos by equal amounts to capture only the workspace where most of the robot manipulation occurs. 
-% Then, they were rescaled to 640 x 480 dimensions with normalization to have a zero mean RGB value as~\cite{krizhevsky2012imagenet,simonyan2014very}. 
-% Finally, for computational reasons, the videos were down-sampled to 10 frame per second. 
-%-----------
+Thereafter, we cluster in sub-spaces of each of the modalities -- perception and kinematics. We start with visual feature being 
+% We extend our prior work with states defined with visual features, and present the \tsc algorithm in Algorithm~\ref{alg:vtsc}.
+Within each visual feature space cluster, we model the kinematics change pointsto be drawn from a GMM:
+$k \sim N(\mu_i, \sigma_i)$, 
+then we can apply a GMM to the kinematic subspace of the change points. Finally, we perform a consistency check in recovered transition state clusters by pruning clusters which do not have change points from at least a $\rho$-fraction of the dataset.
+
+
 
 \begin{algorithm}[t]
 \small
@@ -32,7 +60,9 @@ Then, the videos are rescaled to $640$x$480$ along with down-sampling to $10$ fr
 \KwData{Set of demonstrations:$\mathcal{D}$}
 \SetKwInput{params}{Parameters}
 \params{pruning factor ($\rho$), time window ($w$), PCA dim ($d_p$), hyperparams ($\alpha_1, \alpha_2, \alpha_3, \alpha_4$)}
-\KwResult{Set of Predicted Transitions  $\mathcal{T}_i,\enspace \forall \, d_i \in \mathcal{D}$}
+\KwResult{Set of Predicted Transitions  $\mathcal{T}_i,\enspace
+\forall \, d_i \in \mathcal{D}$}
+{\small \tcp*[l]{\\ \textbf{Task Representation Learning} //}}
 % \Begin{
     \ForEach{$d_i \in \mathcal{D}$}{
         $z_i \gets$ VisualFeatures $(d_i, w, d_p)$\;
@@ -45,7 +75,7 @@ Then, the videos are rescaled to $640$x$480$ along with down-sampling to $10$ fr
     {\scriptsize  \tcp*[l]{Cluster to get Change Points}}
     $\mathcal{C}^{CP} = \textnormal{DPGMM}(N, \alpha_0)$ {\scriptsize  \tcp*[r]{$\alpha_0$ is hyperparameter}}
     \ForEach{$N(n)\in\mathcal{C}^{CP}_{i},\ N(n+1)\in\mathcal{C}^{CP}_{j},i\neq j$ } {$CP \gets CP \cup \{N(n)\}$}
-    {\scriptsize  \tcp*[l]{Cluster over Kinematic Feature Subspace}}
+    {\scriptsize  \tcp*[l]{Cluster over Visual Feature Subspace}}
     $\mathcal{C}_{1} = \textnormal{DPGMM}(CP, \alpha_1)$ {\scriptsize  \tcp*[r]{$\mathcal{C}_{1}$: set of clusters}}
     %  \ForEach{$C^{1}_k \in \mathcal{C}^{1}$}{
     %     \uIf{$\sum_{d_i} \mathbf{1}\Big( \sum_{n:N(n)\in d_i} \mathbf{1}( CP(n) \in C^{1}_k) \geq 1 \Big) \geq \rho |\mathcal{D}|$}{
@@ -54,7 +84,7 @@ Then, the videos are rescaled to $640$x$480$ along with down-sampling to $10$ fr
     %  }
     \ForEach{$C_{k} \in \mathcal{C}_{1}$}{
         $CP(C_{k}) \gets \{CP(n) \in C_{k}, \forall n \in \{1,\ldots,|CP|\}\}$\;
-        {\scriptsize  \tcp*[l]{Cluster over Visual Feature Subspace}}
+        {\scriptsize  \tcp*[l]{Cluster over Kinematic Feature Subspace}}
         $\mathcal{C}_{k2} \gets \textnormal{DPGMM}(CP(C_{k}), \alpha_2)$\;
         \ForEach{$C_{kk'} \in \mathcal{C}_{k2}$}{
             \If{$\sum_{d_i} \mathbf{1}\Big( \sum_{n:N(n)\in d_i} \mathbf{1}( CP(n) \in C_{kk'}) \geq 1 \Big) \leq \rho |\mathcal{D}|$}
@@ -64,12 +94,13 @@ Then, the videos are rescaled to $640$x$480$ along with down-sampling to $10$ fr
             $ \forall\ d_i \in \mathcal{D}$ \textbf{do} $T_i \gets T_i \cup \{CP(n) \in C_{kk'}, \forall n:N(n)\in d_i\}$\;
         }
     }
-    {\scriptsize  \tcp*[l]{Cluster over time to predict Transition Windows}}
+    {\small  \tcp*[l]{\textbf{\\ Temporal Segmentation of Each Demo} //}}
     \ForEach{$d_i \in \mathcal{D}$}{
         Repeat steps 1-17 for $\mathcal{D}' = \mathcal{D} \setminus d_i$\;
         $\mathtt{T}_j \gets \mathtt{T}_j \cup T_j^{(i)}, \ \{\forall\ j: d_j \in \mathcal{D}'\}${\scriptsize \tcp*[r]{$T_j^{(i)}$: \textit{i}th iteration}} 
         % $\mathcal{T}_i \gets DPGMM (\mathtt{T}, \alpha_4)${\scriptsize  \tcp*[r]{store cluster $\mu$ and $\Sigma$}}
     }
+    {\scriptsize  \tcp*[l]{Cluster over time to predict Transition Windows}}
     \lForEach{$d_i \in \mathcal{D}$}{$\mathcal{T}_i \gets DPGMM (\mathtt{T}_i, \alpha_4)$}
     \KwRet{$\mathcal{T}_i,\enspace \forall \, d_i \in \mathcal{D}$}
 % }
@@ -79,13 +110,17 @@ Then, the videos are rescaled to $640$x$480$ along with down-sampling to $10$ fr
 
 
 
-\subsubsection{Visual Featurization}
-Once the images were pre-processed, we applied the convolutional filters from the pre-trained neural networks.
-Yosinski et al. note that CNNs trained on natural images exhibit roughly the same Gabor filters and color blobs on the first layer~\cite{yosinski2014NIPS}. 
-They established that earlier layers in the hierarchy give more general features while later layers give more specific ones. In our experiments, we explore the level of generality of features required for segmentation. 
+% \subsubsection{Visual Featurization}
+% Once the images were pre-processed, we applied the convolutional filters from the pre-trained neural networks.
+% Yosinski et al. note that CNNs trained on natural images exhibit roughly the same Gabor filters and color blobs on the first layer~\cite{yosinski2014NIPS}. 
+% They established that earlier layers in the hierarchy give more general features while later layers give more specific ones. 
+% In our experiments, we explore the level of generality of features required for segmentation. 
 %Features drawn from layers 3 and 4 are generic as opposed to specific features from fully connected layers. 
-In particular, we explore two architectures designed for image classification task on natural images: (a) \textbf{AlexNet: } Krizhevsky et al. proposed multilayer (5 in all) a CNN architecture \cite{krizhevsky2012imagenet}, and (b)~\textbf{VGG: } Simoyan et al. proposed an alternative architecture termed VGG (acronym for Visual Geometry Group) which increased the number of convolutional layers significantly (16 in all)~\cite{simonyan2014very}.
-We also compare these features to other visual featurization techniques such as SIFT and SURF for the purpose of task segmentation using \TSC.
+% In particular, we explore two architectures designed for image classification task on natural images: (a) \textbf{AlexNet: } Krizhevsky et al. proposed multilayer (5 in all) a CNN architecture \cite{krizhevsky2012imagenet}, and (b)~\textbf{VGG: } Simoyan et al. proposed an alternative architecture termed VGG (acronym for Visual Geometry Group) which increased the number of convolutional layers significantly (16 in all)~\cite{simonyan2014very}.
+% We also compare these features to other visual featurization techniques such as SIFT and SURF for the purpose of task segmentation using \TSC.
+
+\vspace{2pt}
+\noindent \textbf{Visual Feature Encoding and Dimensionality Reduction}: 
 
 \subsubsection{Post-Processing: Encoding}
 After constructing these features, the next step is encoding the results of the convolutional filter into a vector $z(t)$.
@@ -107,7 +142,7 @@ VLAD vector is obtained by concatenating $u_k$ over all the K centers, $V = [u_1
 
 \vspace{0.25em}
 \noindent\textbf{Latent Concept Descriptors (LCD) \cite{xu2014discriminative}: }
-Convolutional layers contain important spatial information, albeit at the cost of high dimensional representation. For instance the feature dimension at a convolutional layer can be $c\times c \times M$, where $c$ is filter size and $M$ is number of filters. However using the latent concept descriptors, a layer of size $c\times c \times M$ can be converted into $c^2$ latent concept descriptors with M dimensions. Each latent concept descriptor represents the responses from the M filters for a specific pooling location. 
+Convolutional layers contain important spatial information, albeit at the cost of high dimensional representation. For instance the feature dimension at a convolutional layer can be $c\times c \times M$, where $c$ is filter size and $M$ is number of filters. However using the latent concept descriptors, a layer of size $c\times c \times M$ can be converted into $c^2$ latentwon. 
 \fi
 
 \subsubsection{Post-Processing: Dimensionality Reduction}
@@ -116,15 +151,7 @@ After encoding, we feed the CNN features $z(t)$, often in more than $50$K dimens
 Moreover, GMM-based clustering algorithms usually converge to a local minima and very high dimensional feature spaces can lead to numerical instability or inconsistent behavior.
 We explore multiple dimensionality reduction techniques to find desirable properties of the dimensionality reduction that may improve segmentation performance.
 In particular, we analyze Gaussian Random Projections (GRP), Principal Component Analysis (PCA) and Canonical Correlation Analysis (CCA) in Table~\ref{tab:visual}. GRP serves as a baseline, while PCA is used based on widely application in computer vision~\cite{xu2014discriminative}. We also explore CCA as it finds a projection that maximizes the visual features correlation with the kinematics. 
-\subsection{Robust Temporal Clustering}
-To reduce over-fitting and build a confidence interval as a measure of accuracy over the temporal localization of transitions, we use a Jackknife estimate. It is calculated by aggregating the estimates of each $N-1$ estimate in the sample of size $N$.
-We iteratively hold out one out of the $N$ demonstrations and apply \tsc to the remaining demonstrations. Then, over $N-1$ runs of \tsc, $N-1$ predictions are made $\forall d_i \in \mathcal{D}$. We temporally cluster the transitions across $N-1$ predictions, to estimate final transition time mean and variance $\forall d_i \in \mathcal{D}$. This step is illustrated in step 20-21 of Algorithm~\ref{alg:vtsc}.
 
-%\subsection{Other Extensions}
-\subsection{Sliding Window States}
-To better capture hysteresis and transitions that are not instantaneous, in this current paper, we use rolling window states where each state $\mathbf{x}_{(t)}$ is a concatenation of $T$ historical states.
-We varied the length of temporal history $T$ and evaluated performance of the \TSC algorithm for the suturing task using metric defined in Section~\ref{sec:metrics}.
-We empirically found a sliding window of size 3, i.e.,  $\mathbf{x}_{(t)} = \binom{\mathbf{k}(t)}{\mathbf{z}(t)}$, as the state representation led to improved segmentation accuracy while balancing computational effort. 
 
 \subsection{Skill-Weighted Pruning} 
 %Surgical demonstrations are evaluated by domain-experts using OSATS guidelines~\cite{niitsu2013OSATS}.
@@ -138,6 +165,32 @@ Let, $w_i$ be the weight for each demonstration $d_i \in \mathcal{D}$, such that
 % the centroids of the transition state clusters.
 
 % \vspace{0.5em}
+
+
+% \subsubsection{Modeling Temporal Effects}
+\vspace{3pt}
+\noindent\textbf{Modeling Temporal Effects}\\
+Time can be modeled as a separate sensing modality.
+Without temporal localization, the transitions may be ambiguous.
+For example, in a ``Figure 8" trajectory, the robot may pass over a point twice in the same task.
+We define an augmented state space $\mathbf{x}(t) = \binom{k(t)}{t}$.
+Within a state cluster, we model the times which change points occur as drawn from a GMM: $ t \sim N(\mu_i, \sigma_i)$, 
+then we can apply a GMM to the set of times.
+This groups together events that happen at similar times during the demonstrations.
+The result is clusters of states and times.
+Thus, a transition state $m_k$ is defined as tuple of an ellipsoidal region of the state-space and a time interval.
+
+%\subsection{Other Extensions}
+\subsection{Sliding Window States}
+To better capture hysteresis and transitions that are not instantaneous, in this current paper, we use rolling window states where each state $\mathbf{x}_{(t)}$ is a concatenation of $T$ historical states.
+We varied the length of temporal history $T$ and evaluated performance of the \TSC algorithm for the suturing task using metric defined in Section~\ref{sec:metrics}.
+We empirically found a sliding window of size 3, i.e.,  $\mathbf{x}_{(t)} = \binom{\mathbf{k}(t)}{\mathbf{z}(t)}$, as the state representation led to improved segmentation accuracy while balancing computational effort. 
+
+\subsection{Robust Temporal Clustering}
+To reduce over-fitting and build a confidence interval as a measure of accuracy over the temporal localization of transitions, we use a Jackknife estimate. It is calculated by aggregating the estimates of each $N-1$ estimate in the sample of size $N$.
+We iteratively hold out one out of the $N$ demonstrations and apply \tsc to the remaining demonstrations. Then, over $N-1$ runs of \tsc, $N-1$ predictions are made $\forall d_i \in \mathcal{D}$. We temporally cluster the transitions across $N-1$ predictions, to estimate final transition time mean and variance $\forall d_i \in \mathcal{D}$. This step is illustrated in step 20-21 of Algorithm~\ref{alg:vtsc}.
+
+%\todo{describe the jack-knife estimate to get confidence intervals.}
 
 
 \end{document}

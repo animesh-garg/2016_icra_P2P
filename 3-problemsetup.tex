@@ -1,16 +1,20 @@
 \documentclass[0-main.tex]{subfiles}
 \begin{document}
 
-\section{Prior Work: Transition State Clustering}
+\section{Problem Setup}
 \label{sec:tsc}
+In this section, we formalize the problem studied in this work and the notation that will be used in the rest of the paper.
 
-%\subsection{Transition State Clustering Overview}
-The Transition State Clustering algorithm (TSC), learns clusters of states that mark dynamical regime transitions.
+\subsection{Model Overview \label{sec:model}}
+Each demonstration is modeled as a realization of an unknown time-varying linear dynamical system with a discrete number of dynamical modes and zero-mean process noise.
+Switching events, i.e., when the transition law $A(t) \ne A(t+1)$, happen stochastically as a function of the current state. 
+Thus, the observed transitions from repeated demonstrations induce a probability density $f$ over the state space $\mathcal{X}$.
+The modes of the density, which intuitively represent a propensity of a state $\mathbf{x} \in \mathcal{X}$ to trigger a switch, are called \emph{Transition States}.
+The goal will be to use a Gaussian Mixture Model to approximate $f$. 
 
-\subsection{Learning Transition States}
+\subsubsection{Transition States}
 Let $\mathcal{D}=\{d_1,...,d_k\}$ be the set of demonstrations where each $d_i$ is a trajectory of fully observed robot states and each state is a vector in $\mathbb{R}^d$.
-\tsc finds a set of transition states clusters, which are states across demonstrations associated with the same transition event, reached by a fraction of at least $\rho \in [0,1]$ of the demonstrations.
-%We set $\rho$ to tolerate $1-\rho$ outliers.
+\tsco finds a set of transition states clusters, which are states across demonstrations associated with the same transition event, reached by a fraction of at least $\rho \in [0,1]$ of the demonstrations.
 We assume that demonstrations are recorded in a global fixed coordinate frame and visually from a fixed point of view and they are \emph{consistent} with at least one transition state cluster.
 
 Transitions are defined in terms of switched linear dynamical systems (SLDS).
@@ -19,36 +23,34 @@ We model each demonstration as a SLDS:
 \[
 \mathbf{x}(t+1) = A_{i}\mathbf{x}(t) + W(t) \text{ : } A_i \in \{A_1,...,A_k\}
 \]
-In this model, transitions between regimes $\{A_1,...,A_k\}$ are instantaneous where each time $t$ is associated with exactly one dynamical system matrix $1,...,k$. \emph{Transition state} is defined as the last state before a dynamical regime transition in each demonstration. A Transition state is the state $\mathbf{x}(t)$ at time $t$, such that $A(t) \ne A(t+1)$.
+In this model, transitions between regimes $\{A_1,...,A_k\}$ are instantaneous where each time $t$ is associated with exactly one dynamical system matrix $1,...,k$. \emph{Transition state} is defined as the last state before a dynamical regime transition in each demonstration.
+A Transition state is the state $\mathbf{x}(t)$ at time $t$, such that $A(t) \ne A(t+1)$.
 % Therefore, there will be times $t$ at which $A(t) \ne A(t+1)$.
 
-Suppose there was only one regime, then we obtain a linear regression problem:
-\vspace{-3pt}
-\[
-\arg\min_A \|A X_t - X_{t+1}\|
-\]
-where $X_t$ and $X_{t+1}$ are matrices with $T-1$ columns of $[\mathbf{x}(1),\mathbf{x}(2),...,\mathbf{x}(T-1)]$, and $[\mathbf{x}(2),\mathbf{x}(3),...,\mathbf{x}(T)]$ respectively.
-Moldovan et al. \cite{moldovan2013dirichlet} proves that fitting a Jointly Gaussian model to $n(t) = \binom{\mathbf{x}(t+1)}{\mathbf{x}(t)}$ is equivalent to Bayesian Linear Regression.
-We use Dirichlet Process Gaussian Mixture Models (DP-GMM) to learn the regimes without have to set the number of regimes in advance.
-Each cluster learned signifies a different regime, and co-linear states are in the same cluster.
-To find transition states, we move along a trajectory from $t=1,...,t_f$, and find states at which $n(t)$ is in a different cluster than $n(t+1)$.
-These points mark a transition between clusters (i.e., transition regimes).
-
-\subsection{Learning Transition State Clusters}
+\subsubsection{Transition State Clusters}
 A \emph{transition state cluster} is
 defined as a clustering of the set of transition states across all demonstrations; partitioning these transition states into $m$ non-overlapping similar groups:
-$
+\[
 \mathcal{C} = \{C_1, C_2,...,C_m\}
-$
-We model the states at transition states as drawn from a GMM model: ${x}(t) \sim N(\mu_i, \Sigma_i)$.
-Then, we can apply the DP-GMM again to cluster the state vectors at the transition states.
-Each cluster defines an ellipsoidal region of the state-space space.
+\]
+The model $\mathcal{C}$ can be used to infer structure of the task.
+In the case where, we the transition states are drawn from a GMM model this clustering is the Maximum Likelihood Assignment: 
+\[{x}(t) \sim N(\mu_i, \Sigma_i)\]
+Therefore, associated with each cluster $C_i$, there is a tuple $(\mu_i, \Sigma_i)$, resulting in a generative model that describes an ordered set ellipsoidal regions of the state-space associated with transitions:
+\[
+\{(\mu_1, \Sigma_1),(\mu_2, \Sigma_2),...,(\mu_m, \Sigma_m) \}
+\]
+It turns out that a pure GMM model is overly simplistic, and in this paper, we define $\mathcal{C}$ with a hierarchical clustering approach which associates both states and times to each $C_i$.
 
-\noindent Each of these clusters will have constituent vectors where each $n(t)$ belongs to a demonstration $d_i$. 
-Clusters whose constituent vectors come from fewer than a fraction $\rho$ demonstrations are \emph{pruned}.
+\subsection{Problem Statement}
+The goal of Transition State Clustering is to learn $\mathcal{C}$ from a set of demonstrations of a task. There are two sub-problems related to this goal: (1) learning the parameters of the generative model $\mathcal{C}$ from all demonstrations, and (2) corresponding states in each individual demonstration to segments defined by $\mathcal{C}$. 
 
-\vspace{0.5em}
+\subsubsection{Problem 1. Task Representation}
+A set of demonstrations is consistent if there exists a clustering model $\mathcal{C}$ that respects the partial order of every demonstration (see~\cite{krishnan2015tsc} for a precise definition).
+Given a consistent set of demonstrations, the problem is to find a sequence of transition state clusters $\mathcal{C}$ reached by at least a fraction $\rho$ of the demonstrations. 
+\subsubsection{Problem 2. Temporal Segmentation}
+Given $\mathcal{C}$, the problem is to find a set of \textit{predicted} transitions \textit{for each demonstration} $d_i$. For every $d_i$ there will be some subset of transition state clusters $C^(i) \subseteq \mathcal{C}$ present. The temporal segmentation problem is to associate a $\hat{t}$ for each present transition state. The challenge is that is a random variable $\hat{t}$ since there are only a finite number of demonstrations from which we learn $\mathcal{C}$. We develop a technique to bound $\hat{t}$ in confidence intervals.
 
-\noindent \textit{Given a consistent set of demonstrations, the algorithm finds a sequence of transition state clusters reached by at least a fraction $\rho$ of the demonstrations.}
+In our prior work~\cite{krishnan2015tsc}, we studied Problem (1) for kinematic state spaces augmented with hand-annotated visual features. This work describes an algorithm to learn the parameters in more general state-spaces with automatically constructed visual features. Problem (2) was not addressed in prior work.
 
 \end{document}

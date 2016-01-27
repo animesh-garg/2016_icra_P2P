@@ -8,7 +8,6 @@
 % Macro for Algorithm Name 
 \newcommand{\TSC}{TSC-DL\xspace}
 \newcommand{\tsc}{TSC-DL\xspace}
-\newcommand{\tsco}{TSC\xspace}
 \newcommand{\sys}{\textsf{TSC+VIS}\xspace}
 
 \newboolean{include-notes}
@@ -27,11 +26,6 @@ Multi-Modal Surgical Demonstrations with Deep Learning}
 
 % Visual Transition State Clustering: Unsupervised Segmentation of Multi-Modal Trajectories with Deep Learning based Video Features\\
 
-\setlength{\belowdisplayskip}{2pt} \setlength{\belowdisplayshortskip}{2pt}
-\setlength{\abovedisplayskip}{2pt} \setlength{\abovedisplayshortskip}{2pt}
-\setlength{\belowcaptionskip}{-10pt}
-\selectfont
-
 \author{%
 Adithyavairavan Murali*, Animesh Garg*, Sanjay Krishnan*,\\ Florian T. Pokorny,
 Pieter Abbeel, Trevor Darrell, Ken Goldberg%, %{\footnotesize \textcolor{blue}{[v0.5, \today\,\currenttime]}} 
@@ -45,8 +39,6 @@ Pieter Abbeel, Trevor Darrell, Ken Goldberg%, %{\footnotesize \textcolor{blue}{[
 
 \begin{document}
 
-
-
 \maketitle
 
 \begin{abstract}
@@ -54,7 +46,7 @@ The growth of robot-assisted minimally invasive surgery has led to sizeable data
 Temporal segmentation of these trajectories into meaningful contiguous sections is an important first step to facilitate human training and the automation of subtasks.  
 Manual, or supervised, segmentation can be prone to error and impractical for large datasets. 
 We present Transition State Clustering with Deep Learning (\tsc), a new unsupervised algorithm that leverages video and kinematic data for task-level segmentation, and finds regions of the visual feature space that mark transition events using features constructed from layers of pre-trained image classification Convolutional Neural Networks (CNNs).
-We report results on thee datasets comparing architectures (AlexNet and VGG), choice of convolutional layer, dimensionality reduction techniques, visual encoding, and the use of Scale Invariant Feature Transforms (SIFT).
+We report results on five datasets comparing architectures (AlexNet and VGG), choice of convolutional layer, dimensionality reduction techniques, visual encoding, and the use of Scale Invariant Feature Transforms (SIFT).
 \tsc matches manual annotations with up-to 0.806 Normalized Mutual Information (NMI).
 We also found that using both kinematics and visual data results in increases of up-to 0.215 NMI compared to using kinematics alone.
 We also present cases where \tsc discovers human annotator errors.

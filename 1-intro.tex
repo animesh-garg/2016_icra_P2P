@@ -3,16 +3,18 @@
 
 
 \section{Introduction}
-Kinematic and fixed-camera video demonstrations from robot-assisted minimally invasive procedures can be used for surgical skill assessment~\cite{gao2014jigsaws}, development of finite state machines~\cite{kehoe2014autonomous,murali2015learning}, learning from demonstration (LfD)~\cite{reiley2010motion}, and calibration~\cite{mahler2014learning}.
-Surgical tasks are often multi-step procedures that have complex interactions with the environment, and as a result, demonstrations are noisy and may contain superfluous or repeated actions \cite{krishnan2015tsc}.
-Temporal segmentation of the demonstrations into meaningful contiguous sections facilitates local learning from demonstrations and salvaging good local segments from inconsistent demonstrations.
+%A large and ever increasing number of surgical procedures are performed or aided by surgical robots such as Intuitive Surgical's \textit{da Vinci}.
+The prevalence of robot-assisted surgery is leading to a proliferation of datasets consisting of kinematic and fixed-camera video recordings of surgical procedures.
+While these datasets have the potential to facilitate learning and autonomy, the variability of surgical data poses a unique challenge.
+By nature, surgical robots interact with deformable environments and varying anatomy. 
+Therefore, one of the key challenges in utilizing these datasets is to learn a common sequential structure shared across multiple instances of the same surgical task.
+One model for this sequential task structure is the Transition State model~\cite{krishnan2015tsc}, which identifies spatially and temporally similar changes in motion.
+Thus, while the apparent data might be highly variable, the model often learns latent similarities in tool position or kinematic state.
+The learned model temporally \emph{segments} trajectories into meaningful contiguous sections, which can ultimately facilitate local learning from demonstrations, skill assessment, and salvaging good local segments from otherwise inconsistent demonstrations.
 
-Manual annotation provides one approach to segmentation (e.g., \cite{hanlearning}); however, as datasets grow, this can become impractical.
-Human annotators can also be prone to error by missing segments or applying segmentation criteria inconsistently across a dataset.
-There are a number of recent proposals to algorithmically extract segments \cite{calinon2010learning, Niekum2015learning, krishnan2015tsc}.
-Such algorithms fall into two broad categories: (1) dictionary-based, (2) and unsupervised.
-Dictionary-based algorithms require a pre-defined vocabulary of primitives and decompose new trajectories in terms of the primitives.
-However, specific primitives may not cover all of the actions seen in a set of demonstrations, while broad primitives may overlook important transitions.
+In addition to the Transition State model, there are several recent proposals to learn segmentation criteria directly from data with minimal supervision~\cite{calinon2010learning, Niekum2015learning}.
+Inherently, the success of these approaches is dependent on the state representation, which is particularly challenging for visual features; especially when we want these features to perform well across different tasks. 
+Inspired by the recent success of deep neural networks in reinforcement learning~\cite{levine2015end, lenz2015deep}, this paper explores how segmentation can be learned from visual state representations extracted from \textit{deep} convolutional neural networks (CNNs).
 
 \begin{figure}[t!]
 \centering
@@ -24,9 +26,23 @@ However, specific primitives may not cover all of the actions seen in a set of d
 % \label{fig:pr2_toyplane}
 \vspace{-15pt} 
 \end{figure}
+We propose Transition State Clustering with Deep Learning (\tsc), which extends our previous work~\cite{krishnan2015tsc} with automatically constructed visual features using pre-trained CNNs.
+In our prior work, we identified changes in local linearity in each trajectory, and learned a model to infer regions of the state-space at which changes occurred.
+We modeled these regions as generated from a hierarchical nonparametric Bayesian model, where the number of regions are determined by a Dirichlet Process and the shape of the regions are determined by a mixture of multivariate Gaussian random variables.
+Our surprising finding is that while the original Transition State model was motivated for spatial states, it empirically performs well (in comparison to ground truth) even when applied to trajectories of visual filters derived from layers of CNNs.
+
+However, the integration of the convolutional filters with kinematics is not as straight-forward as concatenating the two parameter spaces.
+This paper addresses two new issues: (1) defining metrics across multiple sensing modalities, and (2) task-trajectory correspondence.
+For (1), it can be challenging to define similarity metrics across states that have both spatial and visual components.
+We propose a hierarchical clustering approach that first clusters over visual space and then over kinematics, which allows us to compare kinematics-kinematics and visual-visual.  
+For (2), \tsc learns a segmentation model for a task given observation of trajectories of the task.
+The problem is that we may want to know how to correspond states from the individual trajectories to the segments of the task learned across all trajectories.
+To learn this correspondence, we propose a novel temporal clustering technique which leverages the Jackknife estimator to correspond global segmentation structure to temporal points in the individual trajectories.
 
 
-% \iffalse
+
+
+ \iffalse
 \begin{SCfigure*}[][t!]
     \centering
     \vspace{-10pt}
@@ -36,6 +52,7 @@ However, specific primitives may not cover all of the actions seen in a set of d
     \label{fig:pipeline}
     \vspace{-10pt}
 \end{SCfigure*}
+\fi
 % \fi
 
 % \begin{figure*}[!t]
@@ -46,30 +63,10 @@ However, specific primitives may not cover all of the actions seen in a set of d
 % \vspace{-15pt}
 % \end{figure*}
 
-Unsupervised techniques avoid dependence on a pre-defined set of primitives using generative mixture models for the data, e.g., locally Gaussian segments, and fit trajectories to these models by clustering together locally similar points \cite{calinon2010learning, krishnan2015tsc, kruger2010learning} \del{fox2009nonparametric}.
-A clustering model allows us to detect outliers and inconsistencies (segmentation points that lie in small clusters) without annotations susceptible to human error.
-It can also give us a natural notion of confidence, through the goodness-of-fit, which can guide the acquisition of demonstrations of segments that require more data. 
-While unsupervised segmentation has been widely studied in the context of kinematic data, increasingly, fixed-camera video is also available.
 
-Visual features can provide information about the state of manipulated objects~\cite{krishnan2015tsc, Niekum2015learning}, and trajectory information when there is state-dependent sensor noise in kinematic data \cite{mahler2014learning}.
-Existing work uses hand-tuned features~\cite{krishnan2015tsc}, poses for all objects in the workspace via AR markers~\cite{Niekum2015learning}, or motion capture markers~\cite{kulic2011incremental}.
-We explore relaxing these constraints by applying recent results in Deep Learning to learn a visual representation that generalizes across tasks.
-
-In this paper, we significantly extend our prior segmentation work, Transition State Clustering~\cite{krishnan2015tsc}, with automatically constructed visual features using \textit{deep} convolutional neural networks (CNNs).
-Computer vision frameworks such as CAFFE~\cite{jia2014caffe} can leverage recent advances in CNNs~\cite{krizhevsky2012imagenet, jia2014caffe, long2014fully} through pre-trained models (on large corpora of natural images). 
-CNNs learn expressive but general feature representations that transfer across domains allowing us to take advantage of the models without having to acquire a large number of examples. 
-Transition State Clustering segments demonstrations by learning switched linear dynamical systems and using clustering to identify regions of the state-space associated with switching events.
-TSC applies a Dirichlet Process Gaussian mixture hierarchically first clustering transition states spatially and then temporally.
-Our prior results suggested that augmenting the state-space with hand-tuned visual features could significantly improve accuracy.
-In the present paper, we extract visual features using filters derived from layers of pre-trained CNNs applied to frames of video recordings and call this new algorithm Transition State Clustering with Deep Learning (\tsc).
-This constructs a high-dimensional trajectory that augments the kinematic state-space (Figure \ref{fig:pipeline}).
-
-% In computer vision, the growing maturity of \emph{deep} featurization e.g., Convolutional Neural Networks (CNNs), has led to a number of seminal results in visual feature extraction \cite{krizhevsky2012imagenet, jia2014caffe, long2014fully}.\del{lecun1995convolutional} Furthermore, frameworks like CAFFE \cite{jia2014caffe} allow for sharing pre-trained models (on large corpora of natural images), and this allows us to take advantage of these results even with relatively small datasets.
-
-We study CNN features for unsupervised temporal trajectory segmentation on five datasets: (1) a synthetic 4 segment example, (2) JIGSAWS surgical needle passing, (3) JIGSAWS surgical suturing, (4) toy plane assembly by the PR2, and (5) Lego assembly by the PR2.
+We evaluate \tsc on three datasets: (1) a synthetic 4 segment example, (2) JIGSAWS surgical needle passing,  and (3) JIGSAWS surgical suturing.
 On the synthetic example, we find that \tsc recovers the 4 underlying segments in the presence of partial state observation (one kinematic state hidden), control noise, and sensor noise. 
-\tsc is an unsupervised algorithm that consistently applies segmentation criteria derived from linear dynamical regimes.
-We compare this criteria with manual annotations when available.
+We also compare \tsc with manual annotations when available.
 On real datasets, we find that \tsc matches the manual annotation with up to 0.806 normalized mutual information.
 Our results also suggest that including kinematics and vision results in increases of up-to 0.215 NMI over kinematics alone.
 We demonstrate the benefits of using an unsupervised approach by presenting examples where \tsc discovers unlabeled segments due to human annotator error (as shown in Figure \ref{fig:suturing}), and can learn across demonstrations with widely varying operator skill levels (as shown in Table \ref{tab:jigsaws}).

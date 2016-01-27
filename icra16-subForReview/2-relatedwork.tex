@@ -3,30 +3,10 @@
 
 \section{Related Work}
 
-\subsection{Deep Features in Robotics}
-Neural networks have demonstrated significant empirical success in end-to-end robotic control problems, where robots learn policies directly from images. 
-For example, Lenz et al. use CNNs for object detection in grasping \cite{lenz2015deep} and
-Levine et al. \cite{levine2015end} CNNs for visuo-motor policy learning.
-The success of convolutional features in learning control policies, suggests that these features may also have other properties related to the underlying dynamical system. 
-For this reason, we decided to explore methodologies for using deep features in segmentation as well, as the Transition State model is motivated by dynamical system theory. 
-We believe that segmentation is an important first step in a number of robot learning applications, and the appropriate choice of visual features is key to accurate segmentation.
-
-\subsection{Visual Gesture Recognition}
-A highly relevant line of work is visual activity recognition, and a number of recent works attempt to segment human motion primtives from videos \cite{hoai2011joint, tang2012learning, yang2013discovering, jones2014unsupervised, wu2014leveraging, wu2015watch}.
-There are a few unsupervised models for segmentation of human actions: Jones et al.\cite{jones2014unsupervised}, Yang et al. \cite{yang2013discovering}, Di Wu et al. \cite{wu2014leveraging} , and Chenxia Wu et al. \cite{wu2015watch}.
-In general, \tsc studies a broader problem of robotic task segmentation where states may be represented by kinematics, vision, or both.
-However, we highlight a few of the key results for detailed comparison.
-Jones et al. \cite{jones2014unsupervised} studied the problem of segmentation with two temporally aligned views of the same action, and they proposed an algorithm called Dual Assignment k-Means (DAKM) to correspond segments in the two views. It is not clear how this would support multiple demonstrations (>2) with temporal inconsistencies.
-Other algorithms derived from k-means have also been popular.
-Yang et al. \cite{yang2013discovering} and Wu et al.  \cite{wu2015watch} use k-means to learn a dictionary of primitive motions, however, in prior work, we found that transition state clustering outperforms a standard k-means segmentation approach.
-In fact, the model that we propose is complementary to these works and would be a robust drop-in-replacement for the k-means dictionary learning step \cite{krishnan2015tsc}.
-The approach taken by Di Wu et al. is to parametrize human actions using a skeleton model, and they learn the parameters to this skeleton model using a deep neural network~\cite{wu2014leveraging}.
-In this work, we explore using generic deep visual features for robotic segmentation without requiring task-specific optimization such as skeleton or action models using in human action recognition.
-
 %\subsection{Related Work}
 
 \subsection{Learning From Demonstrations}
-The motion primitive model is a popular LfD framework that learns to control by composing a discretized set of actions~\cite{ijspreet2002learning,pastor2009learning}.
+One model for learning from demonstrations uses segmentation to discretize action spaces (skill-learning) which allows for efficient learning of complex tasks~\cite{ijspreet2002learning,pastor2009learning}.
 This line of work largely focuses on pre-defined primitives.
 Niekum et al. \cite{niekum2012learning} proposed an unsupervised extension to the motion primitive model by learning a set of primitives using the Beta-Process Autoregressive Hidden Markov Model (BP-AR-HMM).
 The work by Niekum et al. does incorporate visual information, however, it does not use visual information to actually find segments.
@@ -46,6 +26,23 @@ The visual sensing model in Calinon et al. is tailored to the ball task, and in 
 %Surgical robotics has a number of challenges that make segmentation difficult \cite{krishnan2015tsc}.
 %In Krishnan et al. \cite{krishnan2015tsc}, we found that hand-annotated visual features could significantly improve segmentation accuracy.
 Other surgical robotics works have largely studied the problem of supervised segmentation using either segmented examples or a pre-defined dictionary of motions (similar to motion primitives) \cite{varadarajan2009data,tao2013surgical,lea15improved, zappella2013surgical, quellec2014segmentation}.
+
+
+\subsection{Visual Gesture Recognition}
+A number of recent works, attempt to segment human motions from videos \cite{hoai2011joint, tang2012learning, yang2013discovering, jones2014unsupervised, wu2014leveraging, wu2015watch}.
+Tang et al. and Hoai et al. proposed supervised models for human action segmentation from video.
+Building on the supervised models, there are a few unsuperivsed models for segmentation of human actions: Jones et al.\cite{jones2014unsupervised}, Yang et al. \cite{yang2013discovering}, Di Wu et al. \cite{wu2014leveraging} , and Chenxia Wu et al. \cite{wu2015watch}.
+Jones et al. \cite{jones2014unsupervised} restricts their segmentation to learning from two views of the dataset (i.e., two demonstrations).
+Yang et al. \cite{yang2013discovering} and Wu et al.  \cite{wu2015watch} use k-means to learn a dictionary of primitive motions, however, in prior work, we found that transition state clustering outperforms a standard k-means segmentation approach.
+In fact, the model that we propose is complementary to these works and would be a robust drop-in-replacement for the k-means dictionary learning step \cite{krishnan2015tsc}.
+The approach taken by Di Wu et al. is to parametrize human actions using a skeleton model, and they learn the parameters to this skeleton model using a deep neural network.
+In this work, we explore using generic deep visual features for robotic segmentation without requiring task-specific optimization such as skeleton or action models using in human action recognition.
+
+\subsection{Deep Features in Robotics}
+Robotics is increasingly using deep features for visual sensing. For example, Lenz et al. uses pre-trained neural networks for object detection in grasping \cite{lenz2015deep} and
+Levine et al. \cite{levine2015end} fine-tune pre-trained CNNs for policy learning.
+For this reason, we decide to explore methodologies for using deep features in segmentation as well. We believe that segmentation is an important first step in a number of robot learning applications, and the appropriate choice of visual features is key to accurate segmentation.
+We present an initial exploration of different visual featurization strategies and segmentation accuracy.
 
 \iffalse
 \subsection{Trajectory Segmentation Models}

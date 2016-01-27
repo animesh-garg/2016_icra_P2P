@@ -72,25 +72,6 @@ NMI score lies in $[0,\ 1]$, where $0$ indicates independence while $1$  is perf
 \]
 % We compare similarity of predicted transitions to manual labels with the \textit{Dynamic Time Warping} distance between time-steps for transitions and manual labels. We normalize it by the temporal length of each example. This metric captures the total error in alignment of predicted transitions to transitions in manual labels. 
 
-
-\subsection{Pre-processing}
-We found that use of these features requires a number of pre-processing and post-processing steps; in addition to a number of design choices within the CNN such as which convolutional layer(s) to use for composing the visual featurization.
-
-CNNs are trained on static images for image classification, and as a result their features are optimized for identifying salient edges and colors. However, they do not capture temporal features and do differentiate the between robot and workspace features.
-Furthermore, since we aggregate across demonstrations, we need to ensure that these features are largely consistent. 
-To reduce variance due to extraneous objects and lighting changes, we crop each video to capture the only the relevant workspace where robot manipulation occurs.
-Then, the videos are rescaled to $640$x$480$ along with down-sampling to $10$ frames per second for computational efficiency. 
- All frames in the videos are normalied to a \textit{zero} mean in all channels (RGB) individually~\cite{krizhevsky2012imagenet,simonyan2014very}. All of pre-processing were performed with open source \texttt{ffmpeg} library.
-
-Once the images were pre-processed, we applied the convolutional filters from the pre-trained neural networks frame by frame.
-
-% To reduce variance due to extraneous objects and lighting changes, we first pre-processed the videos.
-% We first cropped all videos by equal amounts to capture only the workspace where most of the robot manipulation occurs. 
-% Then, they were rescaled to 640 x 480 dimensions with normalization to have a zero mean RGB value as~\cite{krizhevsky2012imagenet,simonyan2014very}. 
-% Finally, for computational reasons, the videos were down-sampled to 10 frame per second. 
-%-----------
-
-
 \subsection{Evaluation of Visual Featurization}
 In our first experiment, we explore different visual featurization, encoding, and dimensionality reduction techniques.
 We applied \tsc to our suturing experimental dataset, and measured the silhouette score of the resulting transition state clusters.
@@ -111,11 +92,11 @@ We note that neither of the encoding schemes, VLAD or LCD\del{LCD$_{VLAD}$} sign
 % 	\par\vspace{0pt}
 % 	\vspace{-15pt}
 %\end{subfigure}
-
 \caption{(A) The figure shows a 2D synthetic example with a moving point in blue and target in yellow. The robot moves to the target in a straight line in discrete steps, and a new target appears. 
 (B) Segmentation results for repeated demonstrations with variance in target position.
 (C) Segmentation under control noise, sensor noise, and partial observeration.}
 \label{fig:toyEx}
+\vspace{-10pt}
 \end{figure}
 
 
@@ -126,21 +107,8 @@ We found that T = 3 gave the best performance.
 We also found that PCA with k = 1000 dimensions was only marginally better than k = 100 yet required $>$30 mins to run.
 For computational reasons, we selected k = 100.
 
-\begin{figure}[t]
-\centering
-    \includegraphics[width=0.95\linewidth]{figures/t-SNE_suturing}
-    \caption{Each data point in the figure corresponds to a t-SNE visualization of features of single frame in the video. (a) RGB pixel values of original image (b) shallow SIFT features (c) deep features from AlexNet pool5. The changepoints recovered from \tsc are highlighted as black triangles. \label{fig:tsne}}
-\end{figure}
 
 
-\subsection{t-SNE visualization of visual features}
-One of the main insights of this paper is that, suprisingly, trajectories of convolutional features sometimes exhibit the necessary local-linearity needed to apply Transition State Clustering.
-We experimentally tested this by applying dimensionality reduction to trajectories of feature from different video featurization techniques.
-Figure \ref{fig:tsne} shows t-SNE embeddings of visual features extracted for a single demonstration of Suturing. The deep features display clear locally-linear properties and can be more easily clustered than SIFT features extracted for the corresponding frames. 
-We speculate that SIFT breaks up trajectory structure due to its natural scale and location invariance properties.
-We also compared to using the raw RBG image pixel values and discovered that the deep features result in more well-formed locally linear trajectories.
-However, it is important to note that unlike spatial trajectories there are discrete jumps in the convolutional trajectories.
-We hope to explore this problem in more detail in future work.
 
 \iffalse
 \subsubsection{Local Linearity of Visual Features}
